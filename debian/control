@@ -1,0 +1,48 @@
+Source: safeclib
+Priority: optional
+Maintainer: Adam Borowski <kilobyte@angband.pl>
+Build-Depends: debhelper-compat (= 12)
+Standards-Version: 4.3.0
+Section: libs
+Homepage: https://rurban.github.io/safeclib/
+Vcs-Browser: https://github.com/kilobyte/safeclib/tree/debian
+Vcs-Git: https://github.com/kilobyte/safeclib -b debian
+
+Package: libsafec-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Depends: libsafec-3.5-3 (= ${binary:Version}), ${misc:Depends}
+Description: "safe" C libc extensions (Annex K) - dev
+ This library implements controversial C11 Annex K (TR24731) extensions. 
+ They are most commonly known as _s variants implemented by MSVC, dubbed as
+ "secure" to the point of MSVC-related linters claiming standard functions
+ to be deprecated.  However, they've been nearly-universally panned by other
+ libc implementors, the most recent discussion about Annex K removal and/or
+ deprecation being N1967.  It is recommended to avoid using these functions
+ -- they're either prone to misuse or merely inefficient (measuring a
+ string's length twice being the most frequent case).
+ .
+ Yet despite these downsides, it is nice to have these functions available
+ when porting some software that originated on Windows.
+ .
+ This package includes development headers.
+
+Package: libsafec-3.5-3
+Architecture: any
+Multi-Arch: same
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: "safe" C libc extensions (Annex K)
+ This library implements controversial C11 Annex K (TR24731) extensions. 
+ They are most commonly known as _s variants implemented by MSVC, dubbed as
+ "secure" to the point of MSVC-related linters claiming standard functions
+ to be deprecated.  However, they've been nearly-universally panned by other
+ libc implementors, the most recent discussion about Annex K removal and/or
+ deprecation being N1967.  It is recommended to avoid using these functions
+ -- they're either prone to misuse or merely inefficient (measuring a
+ string's length twice being the most frequent case).
+ .
+ Yet despite these downsides, it is nice to have these functions available
+ when porting some software that originated on Windows.
+ .
+ This package includes runtime binaries for the library.
