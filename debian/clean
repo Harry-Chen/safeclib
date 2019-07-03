@@ -1,1 +1,15 @@
-src/.empty
+/src/.empty
+/doc/n1089.pdf
+/doc/n1173_TR_bounds_rationale.pdf
+/.appveyor.yml
+/.cirrus.yml
+/.clang-format
+/.travis.yml
+/build-aux/clang-format-all.sh
+/build-aux/gcov-upd.pl
+/build-aux/gcov.sh
+/doc/c11-standard-final-draft.pdf
+/doc/n1225_TR_bounds.pdf
+/tests/CaseFolding.txt
+/tests/DerivedGeneralCategory.txt
+/tests/tests-bos.pl
