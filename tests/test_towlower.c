@@ -16,7 +16,7 @@
 EXTERN uint32_t _towcase(uint32_t wc, int lower);
 int test_towlower(void);
 
-#define CFOLD "CaseFolding.txt"
+#define CFOLD "/usr/share/unicode/CaseFolding.txt"
 
 int ignore_f = 1;
 
@@ -36,13 +36,8 @@ int test_towlower(void) {
 
     f = fopen(CFOLD, "r");
     if (!f) {
-        printf("downloading %s ...", CFOLD);
-        fflush(stdout);
-        system("wget ftp://ftp.unicode.org/Public/UNIDATA/CaseFolding.txt")
-            ? printf(" done\n")
-            : printf(" failed\n");
-        printf(" done\n");
-        f = fopen(CFOLD, "r");
+        printf("not downloading %s ...", CFOLD);
+        return 1;
     }
     while (!feof(f)) {
         int l;

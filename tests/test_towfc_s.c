@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define CFOLD "CaseFolding.txt"
+#define CFOLD "/usr/share/unicode/CaseFolding.txt"
 
 #if SIZEOF_WCHAR_T > 2
 #define MAX_LEN 4
@@ -65,15 +65,9 @@ int test_towfc_s(void) {
 
     f = fopen(CFOLD, "r");
     if (!f) {
-        printf("downloading %s ...", CFOLD);
-        fflush(stdout);
-        system("wget ftp://ftp.unicode.org/Public/UNIDATA/CaseFolding.txt")
-            ? printf(" done\n")
-            : printf(" failed\n");
-        f = fopen(CFOLD, "r");
-    }
-    if (!f)
+        printf("not downloading %s ...", CFOLD);
         return 1;
+    }
     while (!feof(f)) {
         int l;
         char *p = fgets(s, sizeof(s), f);
