@@ -10,7 +10,7 @@ Vcs-Git: https://github.com/kilobyte/safeclib -b debian
 
 Package: libsafec-dev
 Section: libdevel
-Architecture: any
+Architecture: amd64 arm64 ppc64el i386 mipsel mips64el armel armhf alpha ia64 riscv64 kfreebsd-any sh4 x32
 Multi-Arch: same
 Depends: libsafec-3.5-3 (= ${binary:Version}), ${misc:Depends}
 Description: "safe" C libc extensions (Annex K) - dev
@@ -29,7 +29,7 @@ Description: "safe" C libc extensions (Annex K) - dev
  This package includes development headers.
 
 Package: libsafec-3.5-3
-Architecture: any
+Architecture: amd64 arm64 ppc64el i386 mipsel mips64el armel armhf alpha ia64 riscv64 kfreebsd-any sh4 x32
 Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: "safe" C libc extensions (Annex K)
