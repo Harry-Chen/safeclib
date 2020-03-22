@@ -1,3 +1,10 @@
+safeclib (3.5-3) unstable; urgency=medium
+
+  * Hack around a test failure caused by glibc using an old version of
+    Unicode.  Closes: #954555.
+
+ -- Adam Borowski <kilobyte@angband.pl>  Mon, 23 Mar 2020 00:01:22 +0100
+
 safeclib (3.5-2) unstable; urgency=medium
 
   * Fix a test that tested undefined behaviour.
