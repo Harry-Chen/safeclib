@@ -21,7 +21,7 @@ Description: "safe" C libc extensions (Annex K) - dev
  libc implementors, the most recent discussion about Annex K removal and/or
  deprecation being N1967.  It is recommended to avoid using these functions
  -- they're either prone to misuse or merely inefficient (measuring a
- string's length twice being the most frequent case).
+ string's length multiple times being the most frequent case).
  .
  Yet despite these downsides, it is nice to have these functions available
  when porting some software that originated on Windows.
@@ -40,7 +40,7 @@ Description: "safe" C libc extensions (Annex K)
  libc implementors, the most recent discussion about Annex K removal and/or
  deprecation being N1967.  It is recommended to avoid using these functions
  -- they're either prone to misuse or merely inefficient (measuring a
- string's length twice being the most frequent case).
+ string's length multiple times being the most frequent case).
  .
  Yet despite these downsides, it is nice to have these functions available
  when porting some software that originated on Windows.
