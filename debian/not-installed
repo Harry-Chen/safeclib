@@ -1,0 +1,2 @@
+usr/bin/check_for_unsafe_apis
+usr/lib/*/*.la
