@@ -83,7 +83,7 @@
  * @retval  ESZEROL     when dmax = 0
  * @retval  ESLEMAX     when dmax/slen > RSIZE_MAX_MEM
  * @retval  EOVERFLOW   when dmax/slen > size of dest/src (optionally, when the
- * compiler knows the object_size statically)
+ *                      compiler knows the object_size statically)
  * @retval  ESLEWRNG    when dmax != size of dest and --enable-error-dmax
  * @retval  ESNOSPC     when dmax < slen
  *
@@ -92,9 +92,14 @@
  *
  */
 
+#ifdef FOR_DOXYGEN
+errno_t memmove_s(void *dest, rsize_t dmax, const void *src, rsize_t slen)
+#else
 EXPORT errno_t _memmove_s_chk(void *dest, rsize_t dmax, const void *src,
                               rsize_t slen, const size_t destbos,
-                              const size_t srcbos) {
+                              const size_t srcbos)
+#endif
+{
     uint8_t *dp;
     const uint8_t *sp;
 

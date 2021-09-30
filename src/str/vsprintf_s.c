@@ -96,9 +96,15 @@
  *    sprintf_s(), vsnprintf_s()
  */
 
+#ifdef FOR_DOXYGEN
+int vsprintf_s(char *restrict dest, const rsize_t dmax,
+               const char *restrict fmt, va_list ap)
+#else
 EXPORT int _vsprintf_s_chk(char *restrict dest, const rsize_t dmax,
                            const size_t destbos, const char *restrict fmt,
-                           va_list ap) {
+                           va_list ap)
+#endif
+{
 
     int ret = -1;
     const char *p;
@@ -157,12 +163,12 @@ EXPORT int _vsprintf_s_chk(char *restrict dest, const rsize_t dmax,
 #endif
 
     if (unlikely(dmax && ret >= (int)dmax)
-#ifdef __MINGW32__
+#ifdef HAVE_MINGW32
         || (ret == -1 && errno == ERANGE)
 #endif
     ) {
         handle_error(dest, dmax, "vsprintf_s: len exceeds dmax", ESNOSPC);
-#ifdef __MINGW32__
+#ifdef HAVE_MINGW32
         errno = 0;
 #endif
         return -ESNOSPC; /* different to the standard (=0),

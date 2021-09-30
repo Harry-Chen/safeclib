@@ -29,6 +29,8 @@
  *------------------------------------------------------------------
  */
 
+#define _GNU_SOURCE
+
 #ifdef FOR_DOXYGEN
 #include "safe_lib.h"
 #else
@@ -80,19 +82,19 @@ char *ctime_r(const time_t *, char *);
  * @retval  EOK        on success
  * @retval  ESNULLP    when dest or tm is a NULL pointer
  * @retval  ESLEMIN    when dmax < 26 or *timer < 0
- * @retval  ESLEMAX    when dmax > RSIZE_MAX_STR
+ * @retval  ESLEMAX    when dmax > RSIZE_MAX_STR.
+ *                     Or when *timer > 313360441200L, the year 10000,
+ *                     resp. LONG_MAX on 32bit systems.
  * @retval  EOVERFLOW  when dmax > size of dest (optionally, when the compiler
  *                     knows the object_size statically)
  * @retval  ESLEWRNG   when dmax != size of dest and --enable-error-dmax
- * @retval  ESLEMAX    when *timer > 313360441200L, the year 10000,
- *                     resp. LONG_MAX on 32bit systems
  * @retval  ESNOSPC    when dmax is too small for the result buffer
  * @retval  -1         when ctime_r or ctime returned NULL
  *
  * @note
  *    ctime returns a pointer to static data and is not thread-safe. In
- * addition, it modifies the static tm object which may be shared with gmtime
- * and localtime. POSIX marks this function obsolete and recommends strftime
+ *    addition, it modifies the static tm object which may be shared with gmtime
+ *    and localtime. POSIX marks this function obsolete and recommends strftime
  *    instead. The C standard also recommends strftime instead of ctime and
  *    ctime_s because strftime is more flexible and locale-sensitive.  The
  *    behavior of ctime may be undefined for the values of time_t that result
@@ -102,8 +104,13 @@ char *ctime_r(const time_t *, char *);
  *    asctime_s()
  */
 
+#ifdef FOR_DOXYGEN
+errno_t ctime_s(char *dest, rsize_t dmax, const time_t *timer)
+#else
 EXPORT errno_t _ctime_s_chk(char *dest, rsize_t dmax, const time_t *timer,
-                            const size_t destbos) {
+                            const size_t destbos)
+#endif
+{
     const char *buf;
     size_t len;
 

@@ -108,8 +108,10 @@ any of the arguments corresponding to %s is a null pointer.
  * @see
  *    vswprintf_s(), snwprintf_s(), vsnprintf_s()
  */
-
-#if defined(HAVE_C99) && !defined(TEST_MSVCRT)
+#if defined FOR_DOXYGEN
+int swprintf_s(wchar_t *restrict dest, rsize_t dmax,
+               const wchar_t *restrict fmt, ...)
+#elif defined(SAFECLIB_HAVE_C99) && !defined(TEST_MSVCRT)
 EXPORT int _swprintf_s_chk(wchar_t *restrict dest, rsize_t dmax,
                            const size_t destbos, const wchar_t *restrict fmt,
                            ...)
@@ -122,7 +124,7 @@ EXPORT int swprintf_s(wchar_t *restrict dest, rsize_t dmax,
     wchar_t *p;
     int ret = -1;
     const size_t destsz = dmax * sizeof(wchar_t);
-#if !(defined(HAVE_C99) && !defined(TEST_MSVCRT))
+#if !(defined(SAFECLIB_HAVE_C99) && !defined(TEST_MSVCRT))
     const size_t destbos = BOS_UNKNOWN;
 #endif
 

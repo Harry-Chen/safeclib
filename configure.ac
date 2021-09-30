@@ -4,7 +4,7 @@
 # 2017  Reini Urban <rurban@cpan.org>
 #
 # Copyright (c) 2012, 2013 Cisco Systems
-# Copyright (c) 2017, 2018, 2019 Reini Urban
+# Copyright (c) 2017, 2018, 2019, 2020 Reini Urban
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person
@@ -64,8 +64,11 @@ AM_INIT_AUTOMAKE([1.10 no-define foreign subdir-objects dist-bzip2 dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # this is missing with mingw 1.0
-m4_pattern_allow([AM_PROG_AR])
-AM_PROG_AR
+# m4_pattern_allow([AM_PROG_AR])
+# AM_PROG_AR
+AC_CHECK_TOOLS([AR], [gcc-ar ar])
+AC_CHECK_TOOLS([RANLIB], [gcc-ranlib ranlib])
+AC_CHECK_TOOLS([NM], [gcc-nm nm])
 
 # Enable LibTool as we are building a library
 #LT_PREREQ([2.2.6]) # TODO: don't really know what to put here so leave
@@ -387,16 +390,19 @@ AC_PROG_CC_C11
 if test "x$ac_cv_prog_cc_c99" = "xno"; then
    dnl we really should ERROR, lets see how far can come without
    AC_MSG_WARN([This compiler ${CC} has no c99 support])
+   INSERT_SAFECLIB_HAVE_C99="#undef SAFECLIB_HAVE_C99"
 else
-   AC_DEFINE([HAVE_C99], 1,
+   AC_DEFINE([SAFECLIB_HAVE_C99], 1,
         [Defined to 1 when the compiler supports c99, mostly (...) macros])
    if test "x$ac_cv_prog_cc_c99" != "x"; then
       AC_MSG_RESULT([added $ac_cv_prog_cc_c99 to CFLAGS])
       AM_CFLAGS="$AM_CFLAGS $ac_cv_prog_cc_c99"
    fi
+   INSERT_SAFECLIB_HAVE_C99="#define SAFECLIB_HAVE_C99 1"
 fi
-dnl AM_CONDITIONAL([HAVE_C99], [test "x$ac_cv_prog_cc_c99=no" != "xno"])
-AC_SUBST(HAVE_C99)
+dnl AM_CONDITIONAL([SAFECLIB_HAVE_C99], [test "x$ac_cv_prog_cc_c99=no" != "xno"])
+AC_SUBST(SAFECLIB_HAVE_C99)
+AC_SUBST(INSERT_SAFECLIB_HAVE_C99)
 
 if test "x$ac_cv_prog_cc_c11" != "xno"; then
    AC_DEFINE([HAVE_C11], 1,
@@ -531,6 +537,11 @@ case $host_os in
        [],[$ax_ccf_err])
     ;;
 esac
+AX_APPEND_COMPILE_FLAGS([-fstack-protector-strong -fstack-clash-protection -fcf-protection],
+                         [WARN_CFLAGS],[$ax_ccf_err])
+AX_APPEND_LINK_FLAGS([-fstack-protector-strong -fstack-clash-protection -fcf-protection],
+                         [WARN_LDFLAGS],[$ax_ccf_err])
+
 if test x$ax_cv_check_cflags__Wrestrict = xyes; then
    AC_DEFINE([HAVE_WARNING_RESTRICT], 1, [Have -Wrestrict])
 fi
@@ -552,6 +563,7 @@ dnl against -Werror,-Wgcc-compat fortify errors, only on clang
 INSERT_OBJECT_SIZE="#undef HAVE___BUILTIN_OBJECT_SIZE"
 INSERT_WARN_DMAX="#undef HAVE_WARN_DMAX"
 INSERT_ERROR_DMAX="#undef HAVE_ERROR_DMAX"
+
 if test x$ax_cv_have___builtin_object_size = xyes; then
     AX_CHECK_COMPILE_FLAG([-Wuser-defined-warnings],
         [have_user_defined_warnings="yes"],[have_user_defined_warnings="no"])
@@ -769,6 +781,26 @@ if test x$ax_cv_have___builtin_constant_p = xyes; then
 fi
 AC_SUBST(INSERT_CONSTANT_P)
 
+AX_GCC_FUNC_ATTRIBUTE(format)
+AX_GCC_FUNC_ATTRIBUTE(malloc)
+AX_GCC_FUNC_ATTRIBUTE(returns_nonnull)
+#not yet supported, planned since 2008
+AX_GCC_FUNC_ATTRIBUTE(format_wprintf)
+AX_GCC_FUNC_ATTRIBUTE(format_wscanf)
+
+if test x$ax_cv_have_func_attribute_format_wprintf = xyes; then
+  HAVE_ATTRIBUTE_FORMAT_WPRINTF=1
+else
+  HAVE_ATTRIBUTE_FORMAT_WPRINTF=0
+fi
+if test x$ax_cv_have_func_attribute_format_wscanf = xyes; then
+  HAVE_ATTRIBUTE_FORMAT_WSCANF=1
+else
+  HAVE_ATTRIBUTE_FORMAT_WSCANF=0
+fi
+AC_SUBST(HAVE_ATTRIBUTE_FORMAT_WPRINTF)
+AC_SUBST(HAVE_ATTRIBUTE_FORMAT_WSCANF)
+
 builtins_chk="memcpy memmove memset strcpy strncpy strcat strncat
               printf sprintf snprintf swprintf
               vfprintf vfwprintf vsprintf vsnprintf"
@@ -972,8 +1004,8 @@ AC_SUBST([TARBALL_VERSION_FILE])
 # version information, refer to the libtool manual, section "Updating
 # library version information":
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
-AC_SUBST([SAFEC_SO_VERSION], [3:5:0])
-AC_SUBST([SAFEC_API_VERSION], [3.5])
+AC_SUBST([SAFEC_SO_VERSION], [3:6:0])
+AC_SUBST([SAFEC_API_VERSION], [3.6.0])
 
 # Automake variables, these variables get automagically included at the top
 # of all automake generated make files. This is why you don't see them
@@ -1004,12 +1036,12 @@ fi
 AC_CONFIG_HEADERS([config.h])
 
 AC_CONFIG_FILES([libsafec.pc
-                 include/safe_config.h
-                 include/safe_lib_errno.h
-                 include/safe_types.h
                  Makefile
                  src/Makefile
                  tests/Makefile])
+AC_CONFIG_FILES([include/safe_config.h], [chmod -w include/safe_config.h])
+AC_CONFIG_FILES([include/safe_lib_errno.h], [chmod -w include/safe_lib_errno.h])
+AC_CONFIG_FILES([include/safe_types.h], [chmod -w include/safe_types.h])
 
 AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
 AM_CONDITIONAL([HAVE_POD2MAN], [test -n "POD2MAN"])

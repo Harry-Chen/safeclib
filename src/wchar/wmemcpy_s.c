@@ -98,10 +98,14 @@
  *    memcpy_s(), memcpy16_s(), wmemmove_s(), memmove16_s()
  *
  */
-
+#ifdef FOR_DOXYGEN
+errno_t wmemcpy_s(wchar_t *dest, rsize_t dlen, const wchar_t *src, rsize_t count)
+#else
 EXPORT errno_t _wmemcpy_s_chk(wchar_t *dest, rsize_t dlen, const wchar_t *src,
                               rsize_t count, const size_t destbos,
-                              const size_t srcbos) {
+                              const size_t srcbos)
+#endif
+{
     const rsize_t dmax = dlen * SIZEOF_WCHAR_T;
     const rsize_t smax = count * SIZEOF_WCHAR_T;
 
@@ -127,7 +131,7 @@ EXPORT errno_t _wmemcpy_s_chk(wchar_t *dest, rsize_t dlen, const wchar_t *src,
         if (unlikely(smax > srcbos)) {
             wmem_set((wmem_type *)dest, (uint32_t)dlen, 0);
             MEMORY_BARRIER;
-            invoke_safe_mem_constraint_handler("wmemmove_s: slen exceeds src",
+            invoke_safe_mem_constraint_handler("wmemcpy_s: slen exceeds src",
                                                (void *)src, EOVERFLOW);
             return (RCNEGATE(EOVERFLOW));
         }

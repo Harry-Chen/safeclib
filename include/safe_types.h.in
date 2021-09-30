@@ -3,8 +3,10 @@
  *
  * March 2007, Bo Berry
  * Modified 2012, Jonathan Toppins <jtoppins@users.sourceforge.net>
+ * Modified 2017-2020, Reini Urban <rurban@cpan.org>
  *
  * Copyright (c) 2007-2013 by Cisco Systems, Inc
+ * Copyright (c) 2017-2020 by Reini Urban
  * All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person
@@ -37,15 +39,6 @@
 extern "C" {
 #endif
 
-/* C11 appendix K types - specific for bounds checking */
-#ifndef _RSIZE_T /* PGI */
-typedef size_t  rsize_t;
-#endif
-
-#ifndef RSIZE_MAX
-#define RSIZE_MAX (~(rsize_t)0)  /* leave here for completeness */
-#endif
-
 #ifdef __KERNEL__
 /* linux kernel environment */
 
@@ -73,6 +66,42 @@ typedef int errno_t;
 #endif
 
 #endif /* __KERNEL__ */
+
+/* C11 appendix K types - specific for bounds checking */
+#ifndef _RSIZE_T /* PGI */
+typedef size_t  rsize_t;
+#endif
+
+#ifndef RSIZE_MAX
+#define RSIZE_MAX (~(rsize_t)0)  /* leave here for completeness */
+#endif
+
+#ifdef __GNUC__ /* also clang and icc */
+
+#define __attribute_format__(type, index, check)                               \
+    __attribute__((format(type, index, check)))
+/* Stalled since 2008 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=64862
+   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=38308 */
+#if @HAVE_ATTRIBUTE_FORMAT_WPRINTF@
+#define __attribute_format_wprintf(index, check)                               \
+    __attribute__((format(__wprintf__, index, check)))
+#else
+#define __attribute_format_wprintf(index, check)
+#endif
+#if @HAVE_ATTRIBUTE_FORMAT_WSCANF@
+#define __attribute_format_wscanf(index, check)                                \
+    __attribute__((format(__wscanf__, index, check)))
+#else
+#define __attribute_format_wscanf(index, check)
+#endif
+
+#else
+
+#define __attribute_format__(type, index, check)
+#define __attribute_format_wprintf(index, check)
+#define __attribute_format_wscanf(index, check)
+
+#endif
 
 #ifdef __cplusplus
 }

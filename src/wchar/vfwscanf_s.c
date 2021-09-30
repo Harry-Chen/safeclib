@@ -79,7 +79,7 @@ any of the arguments corresponding to %s is a null pointer.
  * @todo   When an argument is not assigned to, it should be zero'd
  *         (not yet).
  *
- * @retval  > 0  on success, the number of arguments assigned
+ * @retval  int >0  on success, the number of arguments assigned
  * @retval  EOF  on error
  *
  * @see
@@ -88,7 +88,8 @@ any of the arguments corresponding to %s is a null pointer.
  */
 
 EXPORT int vfwscanf_s(FILE *restrict stream, const wchar_t *restrict fmt,
-                      va_list ap) {
+                      va_list ap)
+{
     wchar_t *p;
     int ret;
 
@@ -105,7 +106,7 @@ EXPORT int vfwscanf_s(FILE *restrict stream, const wchar_t *restrict fmt,
         errno = ESNULLP;
         return EOF;
     }
-#ifdef __MINGW32__
+#ifdef HAVE_MINGW32
     if (unlikely(!*fmt)) {
         errno = 0;
         return EOF;

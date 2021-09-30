@@ -47,9 +47,14 @@
 #include <linux/module.h>
 #include <linux/ctype.h>
 
+/* Needed since the switch to time64_t */
+#if defined CONFIG_COMPAT_32BIT_TIME && defined _LINUX_TIME64_H && defined __VDSO_TIME32_H
+#define time_t old_time32_t
+#endif
+
 #define RCNEGATE(x) (-(x))
 
-#ifndef HAVE_C99
+#ifndef SAFECLIB_HAVE_C99
 #define slprintf
 #define sldebug_printf
 #else
@@ -77,10 +82,12 @@
 #ifdef STDC_HEADERS
 #include <ctype.h>
 #include <stdlib.h>
+#if defined(HAVE_SECURE_GETENV)
 #ifndef _GNU_SOURCE_WAS_DEFINED
 #undef _GNU_SOURCE
 #else
 #undef _GNU_SOURCE_WAS_DEFINED
+#endif
 #endif
 #include <stddef.h>
 #include <stdarg.h>
@@ -149,7 +156,7 @@ typedef unsigned long uintptr_t;
 #define RCNEGATE(x) (x)
 
 #define slabort() abort()
-#ifndef HAVE_C99
+#ifndef SAFECLIB_HAVE_C99
 #define slprintf printf
 #define sldebug_printf printf
 #else
@@ -186,7 +193,7 @@ typedef unsigned long uintptr_t;
 #define _UNICODE_MAX 0x10ffff
 
 #ifndef sldebug_printf
-#ifdef HAVE_C99
+#ifdef SAFECLIB_HAVE_C99
 #define sldebug_printf(...)
 #else
 #define sldebug_printf printf
@@ -222,9 +229,9 @@ typedef unsigned long uintptr_t;
 #define GCC_DIAG_RESTORE
 #endif
 
-#if defined(DEBUG) && defined(HAVE_C99) && defined(__KERNEL__)
+#if defined(DEBUG) && defined(SAFECLIB_HAVE_C99) && defined(__KERNEL__)
 #define debug_printf(...) printk(KERN_DEBUG __VA_ARGS__)
-#elif defined(HAVE_C99)
+#elif defined(SAFECLIB_HAVE_C99)
 #define debug_printf(...) fprintf(STDERR, __VA_ARGS__)
 #else
 #define debug_printf printf

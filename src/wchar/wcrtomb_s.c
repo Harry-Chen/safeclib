@@ -111,19 +111,22 @@
  * @retval  EOVERFLOW  when dmax > size of dest (optionally, when the compiler
  *                     knows the object_size statically), unless dest is NULL
  * @retval  ESLEMAX    when dmax > RSIZE_MAX_STR, unless dest is NULL
- * @retval  EOVERFLOW  when dmax > size of dest (optionally, when the compiler
- *                     knows the object_size statically)
  * @retval  ESLEWRNG   when dmax != size of dest and --enable-error-dmax and
- * dest != NULL
+ *                     dest != NULL
  * @retval  ESNOSPC    when dmax is smaller than the number of required bytes
  *
  * @see
  *    wctomb_s()
  */
-
+#ifdef FOR_DOXYGEN
+errno_t wcrtomb_s(size_t *restrict retvalp, char *restrict dest,
+                  rsize_t dmax, wchar_t wc, mbstate_t *restrict ps)
+#else
 EXPORT errno_t _wcrtomb_s_chk(size_t *restrict retvalp, char *restrict dest,
                               rsize_t dmax, wchar_t wc, mbstate_t *restrict ps,
-                              const size_t destbos) {
+                              const size_t destbos)
+#endif
+{
     size_t len;
     errno_t rc;
 

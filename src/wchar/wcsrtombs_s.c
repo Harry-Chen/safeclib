@@ -115,7 +115,8 @@
  * @retval  ESZEROL    when dmax = 0, unless dest is NULL
  * @retval  ESLEMAX    when dmax > RSIZE_MAX_STR, unless dest is NULL
  * @retval  EOVERFLOW  when dmax or len > size of dest (optionally, when the
- * compiler knows the object_size statically), unless dest is NULL
+ *                     compiler knows the object_size statically), unless dest
+ *                     is NULL
  * @retval  ESLEWRNG   when dmax != size of dest and --enable-error-dmax
  * @retval  ESOVRLP    when *srcp and dest overlap
  * @retval  ESNOSPC    when there is no null character in the first dmax
@@ -126,11 +127,17 @@
  * @see
  *    wcrtomb_s(), wcstombs_s()
  */
-
+#ifdef FOR_DOXYGEN
+errno_t wcsrtombs_s(size_t *restrict retvalp, char *restrict dest,
+                    rsize_t dmax, const wchar_t **restrict srcp,
+                    rsize_t len, mbstate_t *restrict ps)
+#else
 EXPORT errno_t _wcsrtombs_s_chk(size_t *restrict retvalp, char *restrict dest,
                                 rsize_t dmax, const wchar_t **restrict srcp,
                                 rsize_t len, mbstate_t *restrict ps,
-                                const size_t destbos) {
+                                const size_t destbos)
+#endif
+{
     size_t l;
     errno_t rc;
 

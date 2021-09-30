@@ -68,6 +68,7 @@ static int test_vfwscanf_s(void) {
     size_t len1;
     size_t len2;
     size_t len3;
+    int num = 0;
     int errs = 0;
 #ifdef USE_PIPE
     int p[2];
@@ -138,19 +139,18 @@ static int test_vfwscanf_s(void) {
     rc = vtwscanf_s(stream, L"%s %%n", str3, 6);
     ERR(1);
     ERRNO(0);
-#ifndef _WIN32
+#if !defined(_WIN32) || defined(HAVE_MINGW64)
     EXPSTR(str3, "24");
 #else
     EXPSTR(str3, "2");
 #endif
 
     stuff_stream(L"      24");
-    rc = vtwscanf_s(stream, L" %d", &len1);
+    rc = vtwscanf_s(stream, L" %d", &num);
     ERR(1);
     ERRNO(0);
-    if ((int)len1 != 24) {
-        debug_printf("%s %u wrong arg: %d\n", __FUNCTION__, __LINE__,
-                     (int)len1);
+    if (num != 24) {
+        debug_printf("%s %u wrong arg: %d\n", __FUNCTION__, __LINE__, num);
         errs++;
     }
 

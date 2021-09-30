@@ -60,20 +60,24 @@
  * @retval  EOK        when successfully character found.
  * @retval  ESNULLP    when dest/resultp is a NULL pointer
  * @retval  ESZEROL    when dmax = 0 or strnlen_s = 0
- * @retval  ESLEMAX    when dmax > RSIZE_MAX_STR
+ * @retval  ESLEMAX    when dmax > RSIZE_MAX_STR or ch > 255
  * @retval  EOVERFLOW  when dmax > size of dest (optionally, when the compiler
  *                     knows the object_size statically)
  * @retval  ESLEWRNG   when dmax != size of dest and --enable-error-dmax
- * @retval  ESLEMAX    when ch > 255
  * @retval  ESNOTFND   when ch not found in dest
  *
  * @see
  *    memrchr_s(), strchr_s(), memchr_s(), strspn_s(), strstr_s()
  *
  */
+#ifdef FOR_DOXYGEN
+errno_t strrchr_s(const char *restrict dest, rsize_t dmax, const int ch, char **resultp)
+#else
 EXPORT errno_t _strrchr_s_chk(const char *restrict dest, rsize_t dmax,
                               const int ch, char **resultp,
-                              const size_t destbos) {
+                              const size_t destbos)
+#endif
+{
     rsize_t len;
 
     CHK_SRC_NULL("strrchr_s", resultp)

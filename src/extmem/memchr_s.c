@@ -55,20 +55,26 @@
  * @pre  dmax shall not be greater than RSIZE_MAX_MEM and sizeof(dest)
  * @pre  ch shall not be greater than 255
  *
- * @retval  EOK        when successfully character found.
+ * @retval  EOK        when the character was successfully found.
  * @retval  ESNULLP    when dest/result is a NULL pointer
  * @retval  ESZEROL    when dmax = 0
- * @retval  ESLEMAX    when dmax > RSIZE_MAX_MEM or > sizeof(dest)
- * @retval  ESLEMAX    when ch > 255
+ * @retval  ESLEMAX    when dmax > RSIZE_MAX_MEM or > sizeof(dest).
+ *                     Or when ch > 255
  * @retval  ESNOTFND   when ch not found in dest
  *
  * @see
  *    strchr_s(), strspn_s(), strcspn_s(), strpbrk_s(), strstr_s()
  *
  */
+#ifdef FOR_DOXYGEN
+errno_t memchr_s(const void *restrict dest, rsize_t dmax,
+                 const int ch, void **result)
+#else
 EXPORT errno_t _memchr_s_chk(const void *restrict dest, rsize_t dmax,
                              const int ch, void **result,
-                             const size_t destbos) {
+                             const size_t destbos)
+#endif
+{
     if (unlikely(result == NULL)) {
         invoke_safe_mem_constraint_handler("memchr_s: result is null",
                                            (void *)dest, ESNULLP);

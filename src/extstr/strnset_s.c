@@ -64,8 +64,7 @@
  * @retval  EOK         when successful
  * @retval  ESNULLP     when dest is NULL pointer
  * @retval  ESZEROL     when dmax = 0
- * @retval  ESLEMAX     when value > 255
- * @retval  ESLEMAX     when dmax > RSIZE_MAX_STR
+ * @retval  ESLEMAX     when value > 255 or dmax > RSIZE_MAX_STR
  * @retval  EOVERFLOW   when dmax > size of dest (optionally, when the compiler
  *                      knows the object_size statically)
  * @retval  ESLEWRNG    when dmax != sizeof(dest) and --enable-error-dmax
@@ -75,8 +74,13 @@
  *    strzero_s(), strset_s(), wcsnset_s(), strispassword_s()
  */
 
-EXPORT errno_t _strnset_s_chk(char *restrict dest, rsize_t dmax, int value,
-                              rsize_t n, const size_t destbos) {
+#ifdef FOR_DOXYGEN
+errno_t strnset_s(char *restrict dest, rsize_t dmax, int value, rsize_t n)
+#else
+EXPORT errno_t _strnset_s_chk(char *restrict dest, rsize_t dmax, int value, rsize_t n,
+                              const size_t destbos)
+#endif
+{
 #ifdef SAFECLIB_STR_NULL_SLACK
     char *orig_dest;
 #endif

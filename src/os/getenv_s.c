@@ -88,19 +88,25 @@
  * @retval  -1         when not found
  */
 
+#ifdef FOR_DOXYGEN
+errno_t getenv_s(size_t *restrict len, char *restrict dest,
+                     rsize_t dmax, const char *restrict name)
+#else
 EXPORT errno_t _getenv_s_chk(size_t *restrict len, char *restrict dest,
                              rsize_t dmax, const char *restrict name,
-                             const size_t destbos) {
+                             const size_t destbos)
+#endif
+{
     const char *buf;
     int len1;
 
     CHK_DEST_NULL("getenv_s")
     CHK_DMAX_ZERO("getenv_s")
     if (destbos == BOS_UNKNOWN) {
-        CHK_DMAX_MAX("ctime_s", RSIZE_MAX_STR)
+        CHK_DMAX_MAX("getenv_s", RSIZE_MAX_STR)
         BND_CHK_PTR_BOUNDS(dest, dmax);
     } else {
-        CHK_DEST_OVR("ctime_s", destbos)
+        CHK_DEST_OVR("getenv_s", destbos)
     }
     if (unlikely(name == NULL)) {
         handle_error(dest, dmax, "getenv_s: name is null", ESNULLP);

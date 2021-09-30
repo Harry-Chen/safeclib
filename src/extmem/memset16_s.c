@@ -59,25 +59,30 @@
  * @pre  n shall not be greater than RSIZE_MAX_MEM16.
  * @pre  2*n may not be greater than dmax
  *
- * @return  If there is a runtime-constraints violation, and if dest is not a
- * null pointer, and if dmax is not larger than RSIZE_MAX_MEM, then, before
- *          reporting the runtime-constraints violation, memset16_s() copies
- *          dmax bytes to the destination.
+ * @return  If there is a runtime-constraints violation, and if dest is
+ *          not a null pointer, and if dmax is not larger than
+ *          RSIZE_MAX_MEM, then, before reporting the
+ *          runtime-constraints violation, memset16_s() copies dmax
+ *          bytes to the destination.
  * @retval  EOK         when operation is successful or n = 0
  * @retval  ESNULLP     when dest is NULL POINTER
- * @retval  ESLEMAX     when dmax > RSIZE_MAX_MEM
+ * @retval  ESLEMAX     when dmax > RSIZE_MAX_MEM or n > RSIZE_MAX_MEM16
  * @retval  EOVERFLOW   when dmax > size of dest (optionally, when the compiler
  *                      knows the object_size statically)
  * @retval  ESLEWRNG    when dmax != size of dest and --enable-error-dmax
- * @retval  ESLEMAX     when n > RSIZE_MAX_MEM16
  * @retval  ESNOSPC     when 2*n > dmax
  *
  * @see
  *    memset_s(), memset32_s()
  *
  */
+#ifdef FOR_DOXYGEN
+errno_t memset16_s(uint16_t *dest, rsize_t dmax, uint16_t value, rsize_t n)
+#else
 EXPORT errno_t _memset16_s_chk(uint16_t *dest, rsize_t dmax, uint16_t value,
-                               rsize_t n, const size_t destbos) {
+                               rsize_t n, const size_t destbos)
+#endif
+{
     errno_t err;
 
     CHK_DEST_MEM_NULL("memset16_s")

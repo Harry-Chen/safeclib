@@ -43,7 +43,7 @@
 #include <linux/ctype.h>
 
 #include <linux/string.h>
-#ifdef HAVE_C99
+#ifdef SAFECLIB_HAVE_C99
 #define printf(...) printk(KERN_INFO __VA_ARGS__)
 #endif
 
@@ -73,10 +73,8 @@
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
-
-/* for malloc/free */
-#if defined(HAVE_STDLIB_H) && (defined(HAVE___BND_CHK_PTR_BOUNDS) ||           \
-                               defined(HAVE___BUILTIN___BND_SET_PTR_BOUNDS))
+/* for malloc/free and mingw BOS */
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
 
@@ -217,13 +215,13 @@
 #endif
 
 #ifdef DEBUG
-#if defined(HAVE_C99) && defined(__KERNEL__)
+#if defined(SAFECLIB_HAVE_C99) && defined(__KERNEL__)
 #define debug_printf(...) printk(KERN_DEBUG __VA_ARGS__)
 #else
 #define debug_printf printf
 #endif
 #else
-#ifdef HAVE_C99
+#ifdef SAFECLIB_HAVE_C99
 #define debug_printf(...)
 #else
 #define debug_printf printf
@@ -231,13 +229,13 @@
 #endif
 
 #ifdef XDEBUG
-#if defined(HAVE_C99)
+#if defined(SAFECLIB_HAVE_C99)
 #define xdebug_printf(...) printf(__VA_ARGS__)
 #else
 #define xdebug_printf printf
 #endif
 #else
-#ifdef HAVE_C99
+#ifdef SAFECLIB_HAVE_C99
 #define xdebug_printf(...)
 #else
 #define xdebug_printf printf
@@ -272,7 +270,7 @@ static inline void *bnd_chk_malloc(size_t n) {
         errs++;                                                                \
     }
 /* msvcrt wprintf prints one byte less. cygwin not */
-#ifdef __MINGW32__
+#if defined(HAVE_MINGW32) && !defined(HAVE_MINGW64)
 #define ERRWCHAR(n)                                                            \
     if (rc != (n)-1) {                                                         \
         debug_printf("%s %u  Error rc=%d \n", __FUNCTION__, __LINE__,          \

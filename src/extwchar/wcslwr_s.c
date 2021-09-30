@@ -75,15 +75,19 @@ EXTERN wint_t towlower(wint_t wc);
  * @see
  *    wcsfc_s(), strtolowercase_s(), strlwr_s(), wcsupr_s()
  */
-
+#ifdef FOR_DOXYGEN
+errno_t wcslwr_s(wchar_t *restrict src, rsize_t slen)
+#else
 EXPORT errno_t _wcslwr_s_chk(wchar_t *restrict src, rsize_t slen,
-                             const size_t srcbos) {
+                             const size_t srcbos)
+#endif
+{
     const size_t srcsz = slen * sizeof(wchar_t);
 
     if (unlikely(slen == 0)) { /* Since C11 slen=0 is allowed */
         return EOK;
     }
-    CHK_SRC_NULL("wcsupr_s", src)
+    CHK_SRC_NULL("wcslwr_s", src)
     if (unlikely(slen > RSIZE_MAX_WSTR)) {
         invoke_safe_str_constraint_handler("wcslwr_s: "
                                            "slen exceeds max",
@@ -94,7 +98,7 @@ EXPORT errno_t _wcslwr_s_chk(wchar_t *restrict src, rsize_t slen,
         BND_CHK_PTR_BOUNDS(src, srcsz);
     } else {
         if (unlikely(srcsz > srcbos)) {
-            invoke_safe_str_constraint_handler("wcsupr_s"
+            invoke_safe_str_constraint_handler("wcslwr_s"
                                                ": smax exceeds src",
                                                (void *)src, EOVERFLOW);
             return RCNEGATE(EOVERFLOW);

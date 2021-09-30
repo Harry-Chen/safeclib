@@ -62,23 +62,28 @@ extern void *memrchr(const void *, int, size_t);
  * @pre  dmax shall not be greater than RSIZE_MAX_MEM and size of dest
  * @pre  ch shall not be greater than 255
  *
- * @retval  EOK        when successfully character found.
+ * @retval  EOK        when the character was successfully found.
  * @retval  ESNULLP    when dest/result is a NULL pointer
  * @retval  ESZEROL    when dmax = 0
- * @retval  ESLEMAX    when dmax > RSIZE_MAX_MEM
+ * @retval  ESLEMAX    when dmax > RSIZE_MAX_MEM or ch > 255
  * @retval  EOVERFLOW  when dmax > size of dest (optionally, when the compiler
  *                     knows the object_size statically)
  * @retval  ESLEWRNG   when dmax != size of dest and --enable-error-dmax
- * @retval  ESLEMAX    when ch > 255
  * @retval  ESNOTFND   when ch not found in dest
  *
  * @see
  *    memrchr_s(), strchr_s(), memchr_s(), strspn_s(), strstr_s()
  *
  */
+#ifdef FOR_DOXYGEN
+errno_t memrchr_s(const void *restrict dest, rsize_t dmax,
+                  const int ch, void **result)
+#else
 EXPORT errno_t _memrchr_s_chk(const void *restrict dest, rsize_t dmax,
                               const int ch, void **result,
-                              const size_t destbos) {
+                              const size_t destbos)
+#endif
+{
     if (unlikely(result == NULL)) {
         invoke_safe_str_constraint_handler("memrchr_s: result is null", NULL,
                                            ESNULLP);
