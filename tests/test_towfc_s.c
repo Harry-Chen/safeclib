@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define CFOLD "/usr/share/unicode/CaseFolding.txt"
+#define CFOLD "CaseFolding.txt"
 
 #if SIZEOF_WCHAR_T > 2
 #define MAX_LEN 4
@@ -65,9 +65,15 @@ int test_towfc_s(void) {
 
     f = fopen(CFOLD, "r");
     if (!f) {
-        printf("not downloading %s ...", CFOLD);
-        return 1;
+        printf("downloading %s ...", CFOLD);
+        fflush(stdout);
+        system("wget ftp://ftp.unicode.org/Public/UNIDATA/CaseFolding.txt")
+            ? printf(" done\n")
+            : printf(" failed\n");
+        f = fopen(CFOLD, "r");
     }
+    if (!f)
+        return 1;
     while (!feof(f)) {
         int l;
         char *p = fgets(s, sizeof(s), f);
@@ -89,11 +95,6 @@ int test_towfc_s(void) {
 
             c = sscanf(code, "%X", &wc);
             if (c) {
-                // These have changed in Unicode 13.
-                // Let's ignore them until glibc is updated.
-                if (wc==0xA7C7 || wc==0xA7C9 || wc==0xA7F5)
-                    continue;
-
                 uint32_t m0;
                 int n, len;
                 uint32_t cp;

@@ -25,8 +25,8 @@ int check_casefolding(uint32_t lwr, uint32_t upr);
 int check(uint32_t wc, const char *status, const char *name);
 int test_towupper(void);
 
-#define GENCAT "/usr/share/unicode/extracted/DerivedGeneralCategory.txt"
-#define CFOLD "/usr/share/unicode/CaseFolding.txt"
+#define GENCAT "DerivedGeneralCategory.txt"
+#define CFOLD "CaseFolding.txt"
 #ifndef PERL
 /* Must have the same Unicode version 9.0, at least 5.26.
    Better 5.27.3 with Unicode 10, 5.30 with 12.1, 5.32 with 13.0
@@ -152,14 +152,26 @@ int test_towupper(void) {
     pl = fopen(TESTPL, "w");
     f = fopen(GENCAT, "r");
     if (!f) {
-        printf("not downloading %s ...", GENCAT);
-        return 1;
+        printf("downloading %s ...", GENCAT);
+        fflush(stdout);
+        if (system("wget "
+                   "ftp://ftp.unicode.org/Public/UNIDATA/extracted/"
+                   "DerivedGeneralCategory.txt"))
+            printf(" done\n");
+        else
+            printf(" failed\n");
+        f = fopen(GENCAT, "r");
     }
 
     cf = fopen(CFOLD, "r");
     if (!cf) {
-        printf("not downloading %s ...", CFOLD);
-        return 1;
+        printf("downloading %s ...", CFOLD);
+        fflush(stdout);
+        if (system("wget ftp://ftp.unicode.org/Public/UNIDATA/CaseFolding.txt"))
+            printf(" done\n");
+        else
+            printf(" failed\n");
+        cf = fopen(CFOLD, "r");
     }
 
     while (!feof(f)) {
