@@ -1,3 +1,16 @@
+safeclib (3.6-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Restore deleted/changed tests.
+  * ... and a bunch of other files (the upstream tarballs are better now).
+  * Patch the build system to not encode exact version in the soname.
+  * ... this changes the runtime library's package name to "libsafec3".
+  * Improve the description a bit.
+  * Add a watch file.
+  * dh 13.
+
+ -- Adam Borowski <kilobyte@angband.pl>  Thu, 30 Sep 2021 11:36:21 +0200
+
 safeclib (3.5-3) unstable; urgency=medium
 
   * Hack around a test failure caused by glibc using an old version of
