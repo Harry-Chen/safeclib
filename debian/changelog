@@ -1,3 +1,10 @@
+safeclib (3.7-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Disable hardening on alpha hppa ia64.
+
+ -- Adam Borowski <kilobyte@angband.pl>  Sat, 29 Jan 2022 19:53:48 +0100
+
 safeclib (3.6-1) unstable; urgency=medium
 
   * New upstream release.
