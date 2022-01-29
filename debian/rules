@@ -8,8 +8,11 @@ export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
 %:
 	dh $@
 
+ifneq (,$(filter alpha hppa ia64,$(DEB_HOST_ARCH)))
+OPTS=--disable-hardening
+endif
 override_dh_auto_configure:
-	dh_auto_configure -- \
+	dh_auto_configure -- $(OPTS)\
 		--disable-static \
 		--disable-doc \
 		--enable-strmax=0x8000
