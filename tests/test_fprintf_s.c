@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------
  * test_fprintf_s
  * File 'io/fprintf_s.c'
- * Lines executed:85.00% of 20
+ * Lines executed:85.71% of 21
  *
  *------------------------------------------------------------------
  */
@@ -70,17 +70,21 @@ int test_fprintf_s(void) {
 
     /*--------------------------------------------------*/
 
-    /* TODO
-    rc = fprintf_s(out, "%p", NULL);
+    rc = fprintf_s(out, "%s", NULL);
     NEGERR(ESNULLP)
-    */
 
     /*--------------------------------------------------*/
 
     strcpy(str, "keep it simple");
 
     rc = fprintf_s(out, "%s", str);
-    NOERRNULL()
+    NOERR()
+
+    rc = fprintf_s(out, "%d", -10000);
+    ERR(6)
+
+    rc = fprintf_s(out, "%ld", -10000L);
+    NOERR()
 
     /*--------------------------------------------------*/
 
@@ -94,7 +98,7 @@ int test_fprintf_s(void) {
     strcpy(str, "keep it simple");
 
     rc = fprintf_s(out, "%s", str);
-    NOERRNULL()
+    ERR(strlen(str))
 
     /*--------------------------------------------------*/
 

@@ -2,6 +2,7 @@
  * vfprintf_s.c
  *
  * September 2017, Reini Urban
+ * November 2021, Reini Urban
  *
  * Copyright (c) 2017 by Reini Urban
  * All rights reserved.
@@ -61,7 +62,7 @@
  *
  * @return  On success the total number of characters written is returned.
  * @return  On failure a negative number is returned.
- * @retval  -ESNULLP when stream/fmt is NULL pointer
+ * @retval  -ESNULLP when stream or fmt is NULL pointer
  * @retval  -EINVAL  when fmt contains %n
  * @retval  -1       on some other error. errno is set then.
  *
@@ -71,20 +72,24 @@ EXPORT int vfprintf_s(FILE *restrict stream, const char *restrict fmt,
                       va_list ap) {
     int ret;
     const char *p;
+    out_fct_wrap_type wrap;
 
     if (unlikely(stream == NULL)) {
         invoke_safe_str_constraint_handler("vfprintf_s: stream is null", NULL,
                                            ESNULLP);
         return -(ESNULLP);
     }
-
+    if (unlikely(fileno(stream) < 0)) {
+        invoke_safe_str_constraint_handler("vfprintf_s: stream is invalid", NULL,
+                                           EBADF);
+        return -(EBADF);
+    }
     if (unlikely(fmt == NULL)) {
         invoke_safe_str_constraint_handler("vfprintf_s: fmt is null", NULL,
                                            ESNULLP);
         return -(ESNULLP);
     }
-
-    if (unlikely((p = strnstr(fmt, "%n", RSIZE_MAX_STR)))) {
+    if (unlikely((p = strstr(fmt, "%n")))) {
         /* at the beginning or if inside, not %%n */
         if ((p - fmt == 0) || *(p - 1) != '%') {
             invoke_safe_str_constraint_handler("vfprintf_s: illegal %n", NULL,
@@ -94,13 +99,23 @@ EXPORT int vfprintf_s(FILE *restrict stream, const char *restrict fmt,
     }
 
     errno = 0;
+#if 0
     ret = vfprintf(stream, fmt, ap);
-
     if (unlikely(ret < 0)) {
         char errstr[128] = "vfprintf_s: ";
         strcat(errstr, strerror(errno));
         invoke_safe_str_constraint_handler(errstr, NULL, -ret);
     }
+#else
+    wrap.arg = stream;
+    ret = safec_vsnprintf_s(safec_out_fchar, "vfprintf_s", (char*)&wrap, (rsize_t)-1, fmt, ap);
+
+    if (unlikely(ret < 0 && errno != 0)) {
+        char errstr[128] = "vfprintf_s: ";
+        strcat(errstr, strerror(errno));
+        invoke_safe_str_constraint_handler(errstr, NULL, -ret);
+    }
+#endif
 
     return ret;
 }

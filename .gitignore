@@ -63,8 +63,11 @@ TAGS
 /stamp-h1
 /aclocal.m4
 /autom4te.cache/
+/libsafec-*
+/fmt
 
 # More generated files
+compile_commands.json
 build-aux/ar-lib
 build-aux/test-driver
 tests/test-suite.log
@@ -72,13 +75,17 @@ tests/test-suite*.log
 tests/test-fc.pl
 tests/test-norm.pl
 tests/test-upr.pl
+tests/CaseFolding.txt
+tests/DerivedGeneralCategory.txt
 Doxyfile
-README.md
 doc/footer
 doc/html
 doc/man
 src/gcov.log
 tests/gcov.log
+src/Scripts.txt
+# generated for u8
+src/extwchar/un8if*.h
 
 #
 # git files that we don't want to ignore even it they are dot-files

@@ -168,7 +168,7 @@ EXTERN struct tm *localtime_s(const time_t *restrict timer,
 
 EXTERN errno_t _getenv_s_chk(size_t *restrict len, char *restrict dest,
                              rsize_t dmax, const char *restrict name,
-                             const size_t destbos) BOS_CHK(dest)
+                             const size_t destbos) BOS_CHK_BUTZERO(dest, dmax)
     BOS_ATTR(_BOS_NULL(name), "empty name");
 #define getenv_s(len, dest, dmax, name)                                        \
     _getenv_s_chk(len, dest, dmax, name, BOS(dest))
@@ -179,7 +179,7 @@ _bsearch_s_chk(const void *key, const void *base, rsize_t nmemb, rsize_t size,
                void *context, const size_t basebos)
     BOS_ATTR(nmemb && (_BOS_NULL(key) || _BOS_NULL(base) ||
                        _BOS_ZERO(base, nmemb *size)),
-             "empty buf or bufsize") BOS_OVR2_BUTNULL(base, nmemb *size)
+             "empty buf or bufsize") BOS_OVR2_BUTNULL(base, nmemb * size)
         BOS_ATTR(nmemb && !compar, "empty compar");
 #define bsearch_s(key, base, nmemb, size, compar, context)                     \
     _bsearch_s_chk(key, base, nmemb, size, compar, context, BOS(base))
@@ -188,8 +188,8 @@ EXTERN errno_t _qsort_s_chk(void *base, rsize_t nmemb, rsize_t size,
                             int (*compar)(const void *x, const void *y,
                                           void *context),
                             void *context, const size_t basebos)
-    BOS_ATTR(nmemb && (_BOS_NULL(base) || _BOS_ZERO(base, nmemb *size)),
-             "empty buf or bufsize") BOS_OVR2_BUTNULL(base, nmemb *size)
+    BOS_ATTR(nmemb && (_BOS_NULL(base) || _BOS_ZERO(base, nmemb * size)),
+             "empty buf or bufsize") BOS_OVR2_BUTNULL(base, nmemb * size)
         BOS_ATTR(nmemb && !compar, "empty compar");
 #ifndef MINGW_HAS_SECURE_API
 #define qsort_s(base, nmemb, size, compar, context)                            \

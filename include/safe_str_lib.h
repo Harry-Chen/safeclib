@@ -56,6 +56,7 @@ extern "C" {
 #endif
 
 #if defined _WIN32 && !defined(DISABLE_DLLIMPORT)
+#undef EXTERN
 #if defined(EXPORT) && defined(__SAFECLIB_PRIVATE_H__)
 #define EXTERN extern __declspec(dllexport)
 #else
@@ -64,6 +65,9 @@ extern "C" {
 #else
 #define EXTERN extern
 #endif
+
+/* With this UCD version we generated our tables */
+#define SAFECLIB_UNICODE_VERSION 14
 
 /**
  * The shortest string is a null string!!
@@ -243,6 +247,22 @@ EXTERN size_t strerrorlen_s(errno_t errnum);
 /* for the other safe IO funcs see safe_lib.h */
 
 #ifndef SAFECLIB_DISABLE_EXTENSIONS
+
+/* improved strcpy */
+EXTERN char *_stpcpy_s_chk(char *restrict dest, rsize_t dmax,
+                           const char *restrict src, errno_t *restrict errp,
+                           const size_t destbos, const size_t srcbos)
+  BOS_CHK(dest) BOS_NULL(src) BOS_NULL(errp);
+#define stpcpy_s(dest, dmax, src, errp)                                     \
+    _stpcpy_s_chk(dest, dmax, src, errp, BOS(dest), BOS(src))
+
+EXTERN char *_stpncpy_s_chk(char *restrict dest, rsize_t dmax,
+                            const char *restrict src, rsize_t slen,
+                            errno_t *restrict errp,
+                            const size_t destbos, const size_t srcbos)
+  BOS_CHK(dest) BOS_CHK2(src, slen) BOS_NULL(errp);
+#define stpncpy_s(dest, dmax, src, slen, errp)                   \
+  _stpncpy_s_chk(dest, dmax, src, slen, errp, BOS(dest), BOS(src))
 
 /* string compare */
 EXTERN errno_t _strcmp_s_chk(const char *dest, rsize_t dmax, const char *src,

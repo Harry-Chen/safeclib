@@ -4,7 +4,7 @@
 # 2017  Reini Urban <rurban@cpan.org>
 #
 # Copyright (c) 2012, 2013 Cisco Systems
-# Copyright (c) 2017, 2018, 2019, 2020 Reini Urban
+# Copyright (c) 2017-2022 Reini Urban
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person
@@ -34,11 +34,7 @@
 AC_PREREQ([2.69])
 
 # information on the package
-AC_INIT([Safe C Library],
-        [m4_esyscmd(build-aux/version-gen.sh .tarball-version)],
-        [https://github.com/rurban/safeclib/issues],
-        [libsafec],
-        [http://github.com/rurban/safeclib/])
+AC_INIT([Safe C Library],[3.7],[https://github.com/rurban/safeclib/issues],[safeclib],[http://github.com/rurban/safeclib/])
 
 # Configure the configure script
 # ===============================================
@@ -81,7 +77,6 @@ PKG_INSTALLDIR
 
 # Global Variable & Defaults
 # ===============================================
-
 # Keep this in sync with what is passed in AC_INIT
 TARBALL_VERSION_FILE=".tarball-version"
 
@@ -97,6 +92,16 @@ dnl         lt_prog_compiler_static=
 dnl         enable_static=no
 dnl         ;;
 dnl esac
+
+AC_MSG_CHECKING([package version])
+AC_MSG_RESULT($PACKAGE_VERSION)
+AC_MSG_CHECKING([so version-info])
+AC_MSG_RESULT($SAFECLIB_SO_VERSION)
+
+ISODATE=`date +%Y-%m-%d`
+AC_SUBST(ISODATE)
+
+AC_CANONICAL_HOST
 
 # Configure options
 # ===============================================
@@ -377,6 +382,14 @@ AC_ARG_ENABLE(debug-build,
 	esac], [enable_debug_build=false ])
 AM_CONDITIONAL(ENABLE_DEBUG_BUILD, test "x$enable_debug_build" = "xtrue")
 
+AC_ARG_ENABLE(hardening,
+	AS_HELP_STRING([--disable-hardening],
+	               [disable hardening @<:@default=no@:>@]),
+	[case "${enableval}" in
+	yes) enable_hardening=true ;;
+	no)  enable_hardening=false ;;
+	*)   AC_MSG_ERROR([bad value ${enableval} for --enable-hardening]) ;;
+	esac], [enable_hardening=true])
 
 AC_MSG_NOTICE([Check programs])
 # ===============================================
@@ -384,8 +397,8 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
 AM_PROG_CC_C_O
-AC_PROG_CC_C99
-AC_PROG_CC_C11
+#AC_PROG_CC_C99
+#AC_PROG_CC_C11
 
 if test "x$ac_cv_prog_cc_c99" = "xno"; then
    dnl we really should ERROR, lets see how far can come without
@@ -537,10 +550,17 @@ case $host_os in
        [],[$ax_ccf_err])
     ;;
 esac
-AX_APPEND_COMPILE_FLAGS([-fstack-protector-strong -fstack-clash-protection -fcf-protection],
-                         [WARN_CFLAGS],[$ax_ccf_err])
-AX_APPEND_LINK_FLAGS([-fstack-protector-strong -fstack-clash-protection -fcf-protection],
-                         [WARN_LDFLAGS],[$ax_ccf_err])
+
+if test "x$enable_hardening" = "xtrue" ; then
+	AX_APPEND_COMPILE_FLAGS(
+	        [-fstack-protector-strong -fstack-clash-protection -fcf-protection \
+	         -fno-strict-aliasing -fno-strict-overflow -fno-delete-null-pointer-checks \
+	         -fno-lifetime-dse],
+	        [WARN_CFLAGS],[$ax_ccf_err])
+	AX_APPEND_LINK_FLAGS(
+	        [-fstack-protector-strong -fstack-clash-protection -fcf-protection],
+	        [WARN_LDFLAGS],[$ax_ccf_err])
+fi
 
 if test x$ax_cv_check_cflags__Wrestrict = xyes; then
    AC_DEFINE([HAVE_WARNING_RESTRICT], 1, [Have -Wrestrict])
@@ -654,6 +674,10 @@ AC_CHECK_PROGS([POD2MAN], [pod2man])
 if test -z "POD2MAN";
    then AC_MSG_WARN([pod2man not found - continuing without pod2man support])
 fi
+AC_CHECK_PROGS([PANDOC], [pandoc])
+if test -z "$PANDOC";
+   then AC_MSG_WARN([pandoc not found - README.rst cannot be generated from README.md])
+fi
 AM_CONDITIONAL([HAVE_DSYMUTIL], [test -n "$ac_ct_DSYMUTIL"])
 
 case $host_os in
@@ -682,6 +706,8 @@ AC_CHECK_HEADERS([stdlib.h	\
                   malloc.h	\
                   string.h	\
                   limits.h	\
+                  stddef.h	\
+                  unistd.h	\
                   sys/types.h	\
                   inttypes.h	\
                   stdint.h	\
@@ -837,6 +863,43 @@ AX_GCC_BUILTIN(__builtin___bnd_chk_ptr_bounds)
 #AX_GCC_BUILTIN(__builtin___bnd_get_ptr_lbound)
 #AX_GCC_BUILTIN(__builtin___bnd_get_ptr_ubound)
 
+AC_CHECK_FUNCS([ vswprintf vswscanf mbsrtowcs ])
+
+dnl this user choice needs to probe first for the default
+AC_ARG_ENABLE(wchar,
+	AS_HELP_STRING([--disable-wchar],
+		       [Disable multibyte and wchar support. @<:@default=no@:>@]),
+	[case "${enableval}" in
+	yes) enable_wchar=true ;;
+	no)  enable_wchar=false ;;
+        dnl early mingw32 have only crippled wchar support: only wcscmp, wcslen
+	*)   if test x$ac_cv_type_wchar_t = xyes -a x$ac_cv_func_vswprintf = xyes \
+                  -a x$ac_cv_header_wchar_h = xyes
+             then
+               enable_wchar=true
+             else
+               AC_MSG_WARN([no proper wchar support])
+               enable_wchar=false
+             fi ;;
+	esac], [enable_wchar=true])
+
+AC_MSG_CHECKING([for --disable-wchar or broken wchar usability])
+dnl catch mingw32 1.0 with crippled wchar
+
+if test x$ac_cv_header_wchar_h = xyes -a x$enable_wchar = xtrue \
+   -a x$ac_cv_func_vswprintf = xyes \
+   -a x$ac_cv_func_mbsrtowcs = xyes -a x$ac_cv_func_vswscanf = xyes
+then
+  enable_wchar=true
+else
+  enable_wchar=false
+fi
+if test "x$enable_wchar" = "xtrue" ; then
+	AC_MSG_RESULT([no (default)])
+else
+	AC_MSG_RESULT([yes])
+fi
+
 AC_MSG_NOTICE([Check library functions])
 # ===============================================
 # dynamic checks if registered via malloc (e.g. libmpx)
@@ -845,9 +908,9 @@ dnl bos enabled chk functions (but not yet usable)
 #for b in $builtins_chk; do
 AC_CHECK_FUNCS([__memcpy_chk __memmove_chk __memset_chk \
         __strcpy_chk __strncpy_chk __strcat_chk __strncat_chk \
-        __printf_chk __sprintf_chk __snprintf_chk __swprintf_chk \
+        __printf_chk __sprintf_chk __snprintf_chk  \
         __vfprintf_chk __vfwprintf_chk __vsprintf_chk __vsnprintf_chk \
-        __vsscanf_chk __vswscanf_chk ])
+        __vsscanf_chk ])
 #done
 dnl They need to include the relevant intrin header first
 dnl TODO: probe for MEMORY_BARRIER and COMPILER_BARRIER here
@@ -857,45 +920,58 @@ AC_FUNC_MEMCMP
 dnl no header needed as is checks if the linker can find it
 dnl mbstowcs missing on cygwin64
 AC_CHECK_FUNCS([ memset strcmp strcasecmp strcasestr strcspn strpbrk strspn \
-        strnstr strnlen strrchr memrchr strstr wmemchr wmemcmp wcscmp wcsstr \
-        vswprintf vsnwprintf vswscanf mbsrtowcs mbstowcs iswdigit iswspace \
-        towlower towupper towctrans bcmp secure_getenv timingsafe_memcmp \
+        strnstr strnlen strrchr memrchr strstr bcmp secure_getenv timingsafe_memcmp \
         timingsafe_bcmp explicit_bzero explicit_memset \
-        asctime_r ctime_r gmtime_r localtime_r memccpy ])
+        asctime_r ctime_r gmtime_r localtime_r memccpy stpcpy stpncpy])
+
+if test "x$enable_wchar" = "xtrue" ; then        
+   AC_CHECK_FUNCS([ wmemchr wmemcmp wcscmp wcsstr \
+        vswprintf vsnwprintf vswscanf mbsrtowcs mbstowcs iswdigit iswspace \
+        towlower towupper towctrans ])
+   AC_CHECK_FUNCS([ __swprintf_chk  __vfwprintf_chk __vswscanf_chk ])
+fi
 
 dnl add the extensions, pretending we want them
-$as_echo '#define __STDC_WANT_LIB_EXT1__  1' >>confdefs.h
+echo "#define __STDC_WANT_LIB_EXT1__  1" >>confdefs.h
+
 dnl native safec shadowing functions (should be none)
 AC_CHECK_FUNCS([_memcpy_s_chk _memmove_s_chk _memset_s_chk _memcmp_s_chk \
         _strcpy_s_chk _strncpy_s_chk _strcat_s_chk _strncat_s_chk _strnlen_s_chk \
-        _printf_s_chk _sprintf_s_chk _snprintf_s_chk _swprintf_s_chk \
-        _vfprintf_s_chk _vfwprintf_s_chk _vsprintf_s_chk _vsnprintf_s_chk ])
+        _printf_s_chk _sprintf_s_chk _snprintf_s_chk \
+        _vfprintf_s_chk _vsprintf_s_chk _vsnprintf_s_chk])
+
 dnl native C11 Annex K functions
 dnl vsnprintf_s vsnwprintf_s strtok_s wcstok_s deviate in mingw from c11
 AC_CHECK_FUNCS(
       [ memset_s memcpy_s memmove_s memzero_s memchr_s memrchr_s memccpy_s \
         sprintf_s strcat_s strcpy_s strncat_s strncpy_s \
-        strnlen_s strtok_s strerror_s vsprintf_s tmpnam_s snprintf_s \
-        vsnprintf_s snwprintf_s \
+        strnlen_s strtok_s strerror_s vsprintf_s tmpnam_s snprintf_s vsnprintf_s \
         strspn_s strset_s strchr_s strrchr_s strstr_s strzero_s strnset_s \
-        mbsrtowcs_s mbstowcs_s wcsrtombs_s wcstombs_s \
-        wcrtomb_s wctomb_s wcsnlen_s wcscpy_s wcsncpy_s wcscat_s wcsncat_s \
-        wmemcpy_s wmemmove_s wcstok_s vswprintf_s swprintf_s vfwprintf_s \
-        vwprintf_s wprintf_s fwprintf_s swscanf_s vswscanf_s wscanf_s \
-        vfwscanf_s fwscanf_s vwscanf_s vsnwprintf_s wcsstr_s wmemcmp_s \
-        wcscmp_s wcsncmp_s wcsicmp_s wcsset_s wcsnset_s wcscoll_s wcslwr_s \
-        wcsupr_s towfc_s wcsfc_s sscanf_s fscanf_s scanf_s vfscanf_s \
+        stpcpy_s stpncpy_s \
+        sscanf_s fscanf_s scanf_s vfscanf_s \
         vsscanf_s vscanf_s printf_s fprintf_s tmpfile_s vfprintf_s vprintf_s \
         fopen_s freopen_s gets_s bsearch_s qsort_s gmtime_s localtime_s \
         asctime_s ctime_s getenv_s ])
+
+if test "x$enable_wchar" = "xtrue" ; then        
+   AC_CHECK_FUNCS(
+      [ mbsrtowcs_s mbstowcs_s wcsrtombs_s wcstombs_s \
+        wcrtomb_s wctomb_s wcsnlen_s wcscpy_s wcsncpy_s wcscat_s wcsncat_s \
+        wmemcpy_s wmemmove_s wcstok_s vswprintf_s swprintf_s vfwprintf_s \
+        vwprintf_s wprintf_s snwprintf_s fwprintf_s swscanf_s vswscanf_s wscanf_s \
+        vfwscanf_s fwscanf_s vwscanf_s vsnwprintf_s wcsstr_s wmemcmp_s \
+        wcscmp_s wcsncmp_s wcsicmp_s wcsset_s wcsnset_s wcscoll_s wcslwr_s \
+        wcsupr_s towfc_s wcsfc_s  ])
+   AC_CHECK_FUNCS([ _swprintf_s_chk _vfwprintf_s_chk ])
+fi
 dnl but delete it, because we override it case by case
 $GREP -v '__STDC_WANT_LIB_EXT1__' confdefs.h > confdefs.h.tmp
 mv confdefs.h.tmp confdefs.h
         
 AM_CONDITIONAL([HAVE_WCSSTR], [test "x$ac_cv_func_wcsstr" = "xyes"])
 AM_CONDITIONAL([HAVE_MBSTOWCS], [test "x$ac_cv_func_mbstowcs" = "xyes"])
-AM_CONDITIONAL([HAVE_MEMCPY_S], [test "x$ac_cv_func_memcpy_s" = "xyes"])
 AM_CONDITIONAL([HAVE_VSNWPRINTF_S], [test "x$ac_cv_func_vsnwprintf_s" = "xyes"])
+AM_CONDITIONAL([HAVE_MEMCPY_S], [test "x$ac_cv_func_memcpy_s" = "xyes"])
 AM_CONDITIONAL([HAVE_TIMINGSAFE_BCMP],
    [test "x$ac_cv_func_timingsafe_memcmp" = "xyes" -a "x$ac_cv_func_timingsafe_bcmp" = "xyes" ])
 
@@ -937,41 +1013,10 @@ return strnstr("%s %n", "%n", 6) ? 0 : 1;
 	[ AC_MSG_RESULT([no (cross)]) ])
 fi
 
-dnl this user choice needs to probe first for the default
-AC_ARG_ENABLE(wchar,
-	AS_HELP_STRING([--disable-wchar],
-		       [Disable multibyte and wchar support. @<:@default=no@:>@]),
-	[case "${enableval}" in
-	yes) enable_wchar=true ;;
-	no)  enable_wchar=false ;;
-        dnl early mingw32 have only crippled wchar support: only wcscmp, wcslen
-	*)   if test x$ac_cv_type_wchar_t = xyes -a x$ac_cv_func_vswprintf = xyes \
-                  -a x$ac_cv_header_wchar_h = xyes
-             then
-               enable_wchar=true
-             else
-               AC_MSG_WARN([no proper wchar support])
-               enable_wchar=false
-             fi ;;
-	esac], [enable_wchar=true])
-AC_MSG_CHECKING([for --disable-wchar or broken wchar usability])
-dnl catch mingw32 1.0 with crippled wchar
-
-
-if test x$ac_cv_header_wchar_h = xyes -a x$enable_wchar = xtrue \
-   -a x$ac_cv_func_vswprintf = xyes \
-   -a x$ac_cv_func_mbsrtowcs = xyes -a x$ac_cv_func_vswscanf = xyes
-then
-  enable_wchar=true
-else
-  enable_wchar=false
-fi
 if test "x$enable_wchar" = "xtrue" ; then
-	AC_MSG_RESULT([no (default)])
         INSERT_DISABLE_WCHAR="#undef SAFECLIB_DISABLE_WCHAR"
         AX_COMPILE_CHECK_SIZEOF(wchar_t, [#include <wchar.h>])
 else
-	AC_MSG_RESULT([yes])
         INSERT_DISABLE_WCHAR="#define SAFECLIB_DISABLE_WCHAR 1"
         ac_cv_header_wchar_h=no
 fi
@@ -1004,8 +1049,8 @@ AC_SUBST([TARBALL_VERSION_FILE])
 # version information, refer to the libtool manual, section "Updating
 # library version information":
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
-AC_SUBST([SAFEC_SO_VERSION], [3:6:0])
-AC_SUBST([SAFEC_API_VERSION], [3.6.0])
+AC_SUBST([SAFEC_SO_VERSION], [3:7:0])
+AC_SUBST([SAFEC_API_VERSION], [3.7.0])
 
 # Automake variables, these variables get automagically included at the top
 # of all automake generated make files. This is why you don't see them
@@ -1044,7 +1089,8 @@ AC_CONFIG_FILES([include/safe_lib_errno.h], [chmod -w include/safe_lib_errno.h])
 AC_CONFIG_FILES([include/safe_types.h], [chmod -w include/safe_types.h])
 
 AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
-AM_CONDITIONAL([HAVE_POD2MAN], [test -n "POD2MAN"])
+AM_CONDITIONAL([HAVE_POD2MAN], [test -n "$POD2MAN"])
+AM_CONDITIONAL([HAVE_PANDOC], [test -n "$PANDOC"])
 AM_CONDITIONAL([HAVE_WINE], [test -n "$WINE"])
 AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([Doxyfile])])
 AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([doc/footer])])

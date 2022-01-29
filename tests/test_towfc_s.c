@@ -3,7 +3,7 @@
  * File 'towfc_s.c'
  * Lines executed:98.28% of 174
  *
- * Full case-folding regarding latest Unicode (10.0) CaseFolding.txt
+ * Full case-folding regarding latest Unicode (14.0) CaseFolding.txt
  * Some F characters fold to multiples.
  *------------------------------------------------------------------
  */
@@ -67,13 +67,16 @@ int test_towfc_s(void) {
     if (!f) {
         printf("downloading %s ...", CFOLD);
         fflush(stdout);
-        system("wget ftp://ftp.unicode.org/Public/UNIDATA/CaseFolding.txt")
-            ? printf(" done\n")
-            : printf(" failed\n");
+        if (system("wget https://www.unicode.org/Public/14.0.0/ucd/CaseFolding.txt"))
+            printf(" done\n");
+        else {
+            printf(" failed\n");
+            return 0;
+        }
         f = fopen(CFOLD, "r");
+        if (!f)
+            return 0;
     }
-    if (!f)
-        return 1;
     while (!feof(f)) {
         int l;
         char *p = fgets(s, sizeof(s), f);
@@ -111,7 +114,7 @@ int test_towfc_s(void) {
                     ERR(ESNOTFND);
                     if (n) {
                         printf("%s %u  Error %d U+%04X n=%d 0x%x\n",
-                               __FUNCTION__, __LINE__, rc, wc, n, (int)cp);
+                               __FUNCTION__, __LINE__, rc, wc, n, (unsigned)cp);
                         errs++;
                     }
                 }
@@ -195,8 +198,7 @@ int test_towfc_s(void) {
                             WEXPSTR(result, L"i");
                         }
                     }
-                } else if (*status ==
-                           'S') { /* ignore as we handle the other F case */
+                } else if (*status == 'S') { /* ignore as we handle the other F case */
                     ;
                 } else { /* the simple 1:1 C case */
 #if SIZEOF_WCHAR_T > 2
@@ -207,15 +209,13 @@ int test_towfc_s(void) {
                     {
                         errs++;
                         printf("%s %u  Error: iswfc(U+%04X) => %d (towfc=>%d) "
-                               "\"%s\" status=%s %s\n",
-                               __FUNCTION__, __LINE__, wc, n, len, mapping,
-                               status, name);
+                               "\"%s\" status=%s %s\n", __FUNCTION__, __LINE__, wc,
+                               n, len, mapping, status, name);
                     } else if (cp != m0) {
                         errs++;
-                        printf("%s %u  Error: towfc(U+%04X) => %X \"%s\" "
-                               "status=%s %s\n",
-                               __FUNCTION__, __LINE__, wc, cp, mapping, status,
-                               name);
+                        printf("%s %u  Error: towfc(U+%04X) => %X != %X \"%s\" "
+                               "status=%s %s\n", __FUNCTION__, __LINE__, wc, cp, m0,
+                               mapping, status, name);
                     }
                 }
             }

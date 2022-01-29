@@ -85,6 +85,8 @@ STD_UNSAFE_FILES = \
 	io/tmpnam_s.c
 
 EXT_STR_FILES = \
+	extstr/stpcpy_s.c            \
+	extstr/stpncpy_s.c           \
 	extstr/strcasecmp_s.c        \
 	extstr/strcasestr_s.c        \
 	extstr/strcmp_s.c            \
@@ -265,7 +267,7 @@ endif
 #$(EXPORT_SYM): safec.h.in
 #        sed -n -e 's/^..*SAFEC_EXPORT[[:space:]][[:space:]]*\([[:alnum:]_][[:alnum:]_]*\)..*$$/\1/p' @top_srcdir@/src/safec.h.in > $@
 
-lib_LTLIBRARIES      = libsafec.la
+lib_LTLIBRARIES  = libsafec.la
 libsafec_la_SOURCES = \
 	$(STD_MEM_FILES)    \
 	$(STD_STR_FILES)    \
@@ -291,7 +293,8 @@ libsafec_la_LIBADD += \
 endif
 libsafec_la_LDFLAGS = \
 	-version-info $(SAFEC_SO_VERSION) \
-	-no-undefined
+	-no-undefined \
+	$(LDFLAGS) $(AM_LDFLAGS)
 #	-export-symbols $(EXPORT_SYM)
 #libsafec_la_DEPENDENCIES = $(EXPORT_SYM)
 

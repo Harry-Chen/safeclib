@@ -51,14 +51,15 @@ dist_pkginclude_HEADERS = \
 
 # Support files
 SAFEC_INFRA = \
-	$(top_srcdir)/README                       \
+	$(top_srcdir)/README.md                  \
+	README.rst                               \
 	${top_srcdir}/build-aux/autogen.sh       \
 	${top_srcdir}/build-aux/msys2.bat        \
 	${top_srcdir}/build-aux/smoke.sh         \
 	$(top_srcdir)/build-aux/version-gen.sh   \
-	$(top_srcdir)/doc/libc-overview.md     	   \
-	$(top_srcdir)/scripts                      \
-	$(top_srcdir)/.version                     \
+	$(top_srcdir)/doc/libc-overview.md     	 \
+	$(top_srcdir)/scripts                    \
+	$(top_srcdir)/.version                   \
 	$(top_srcdir)/libsafec.pc.in
 
 SAFEC_GENHEADERS = \
@@ -137,7 +138,6 @@ dist_man_MANS += \
 	doc/man/man3/RSIZE_MAX_MEM16.3	\
 	doc/man/man3/RSIZE_MAX_MEM32.3	\
 	doc/man/man3/RSIZE_MAX_STR.3	\
-	doc/man/man3/RSIZE_MAX_WMEM.3	\
 	doc/man/man3/RSIZE_MAX_WSTR.3	\
 	doc/man/man3/RSIZE_MIN_STR.3	\
 	doc/man/man3/SAFECLIB_STR_NULL_SLACK.3	\
@@ -166,10 +166,6 @@ dist_man_MANS += \
 	doc/man/man3/freopen_s.c.3	\
 	doc/man/man3/fscanf_s.3		\
 	doc/man/man3/fscanf_s.c.3	\
-	doc/man/man3/fwprintf_s.3	\
-	doc/man/man3/fwprintf_s.c.3	\
-	doc/man/man3/fwscanf_s.3	\
-	doc/man/man3/fwscanf_s.c.3	\
 	doc/man/man3/getenv_s.3		\
 	doc/man/man3/getenv_s.c.3	\
 	doc/man/man3/gets_s.3		\
@@ -182,10 +178,6 @@ dist_man_MANS += \
 	doc/man/man3/invoke_safe_str_constraint_handler.3	\
 	doc/man/man3/localtime_s.3	\
 	doc/man/man3/localtime_s.c.3	\
-	doc/man/man3/mbsrtowcs_s.3	\
-	doc/man/man3/mbsrtowcs_s.c.3	\
-	doc/man/man3/mbstowcs_s.3	\
-	doc/man/man3/mbstowcs_s.c.3	\
 	doc/man/man3/mem_handler.3	\
 	doc/man/man3/mem_prim_move.3	\
 	doc/man/man3/mem_prim_move16.3	\
@@ -254,8 +246,6 @@ dist_man_MANS += \
 	doc/man/man3/set_str_constraint_handler_s.3	\
 	doc/man/man3/snprintf_s.3	\
 	doc/man/man3/snprintf_s.c.3	\
-	doc/man/man3/snwprintf_s.3	\
-	doc/man/man3/snwprintf_s.c.3	\
 	doc/man/man3/sprintf_s.3	\
 	doc/man/man3/sprintf_s.c.3	\
 	doc/man/man3/sscanf_s.3		\
@@ -356,10 +346,6 @@ dist_man_MANS += \
 	doc/man/man3/strupr_s.3		\
 	doc/man/man3/strzero_s.3	\
 	doc/man/man3/strzero_s.c.3	\
-	doc/man/man3/swprintf_s.3	\
-	doc/man/man3/swprintf_s.c.3	\
-	doc/man/man3/swscanf_s.3	\
-	doc/man/man3/swscanf_s.c.3	\
 	doc/man/man3/timingsafe_bcmp.3	\
 	doc/man/man3/timingsafe_bcmp.c.3	\
 	doc/man/man3/timingsafe_memcmp.3	\
@@ -368,41 +354,48 @@ dist_man_MANS += \
 	doc/man/man3/tmpfile_s.c.3	\
 	doc/man/man3/tmpnam_s.3		\
 	doc/man/man3/tmpnam_s.c.3	\
-	doc/man/man3/towctrans.c.3	\
-	doc/man/man3/towfc_s.3		\
-	doc/man/man3/towfc_s.c.3	\
-	doc/man/man3/towlower.3		\
-	doc/man/man3/towupper.3		\
-	doc/man/man3/unw16ifcan.h.3	\
-	doc/man/man3/unw16ifcmb.h.3	\
-	doc/man/man3/unw16ifcmp.h.3	\
-	doc/man/man3/unw16ifcpt.h.3	\
-	doc/man/man3/unw16ifexc.h.3	\
-	doc/man/man3/unwifcan.h.3	\
-	doc/man/man3/unwifcmb.h.3	\
-	doc/man/man3/unwifcmp.h.3	\
-	doc/man/man3/unwifcpt.h.3	\
-	doc/man/man3/unwifexc.h.3	\
 	doc/man/man3/vfprintf_s.3	\
 	doc/man/man3/vfprintf_s.c.3	\
 	doc/man/man3/vfscanf_s.3	\
 	doc/man/man3/vfscanf_s.c.3	\
-	doc/man/man3/vfwprintf_s.3	\
-	doc/man/man3/vfwprintf_s.c.3	\
-	doc/man/man3/vfwscanf_s.3	\
-	doc/man/man3/vfwscanf_s.c.3	\
 	doc/man/man3/vprintf_s.3	\
 	doc/man/man3/vprintf_s.c.3	\
 	doc/man/man3/vscanf_s.3	\
 	doc/man/man3/vscanf_s.c.3	\
 	doc/man/man3/vsnprintf_s.3	\
 	doc/man/man3/vsnprintf_s.c.3	\
-	doc/man/man3/vsnwprintf_s.3	\
-	doc/man/man3/vsnwprintf_s.c.3	\
 	doc/man/man3/vsprintf_s.3	\
 	doc/man/man3/vsprintf_s.c.3	\
 	doc/man/man3/vsscanf_s.3	\
-	doc/man/man3/vsscanf_s.c.3	\
+	doc/man/man3/vsscanf_s.c.3
+if ENABLE_WCHAR
+dist_man_MANS += \
+	doc/man/man3/RSIZE_MAX_WMEM.3	\
+	doc/man/man3/fwprintf_s.3	\
+	doc/man/man3/fwprintf_s.c.3	\
+	doc/man/man3/fwscanf_s.3	\
+	doc/man/man3/fwscanf_s.c.3	\
+	doc/man/man3/mbsrtowcs_s.3	\
+	doc/man/man3/mbsrtowcs_s.c.3	\
+	doc/man/man3/mbstowcs_s.3	\
+	doc/man/man3/mbstowcs_s.c.3	\
+	doc/man/man3/snwprintf_s.3	\
+	doc/man/man3/snwprintf_s.c.3	\
+	doc/man/man3/swprintf_s.3	\
+	doc/man/man3/swprintf_s.c.3	\
+	doc/man/man3/swscanf_s.3	\
+	doc/man/man3/swscanf_s.c.3	\
+	doc/man/man3/towctrans.c.3	\
+	doc/man/man3/towfc_s.3		\
+	doc/man/man3/towfc_s.c.3	\
+	doc/man/man3/towlower.3		\
+	doc/man/man3/towupper.3		\
+	doc/man/man3/vfwprintf_s.3	\
+	doc/man/man3/vfwprintf_s.c.3	\
+	doc/man/man3/vfwscanf_s.3	\
+	doc/man/man3/vfwscanf_s.c.3	\
+	doc/man/man3/vsnwprintf_s.3	\
+	doc/man/man3/vsnwprintf_s.c.3	\
 	doc/man/man3/vswprintf_s.3	\
 	doc/man/man3/vswprintf_s.c.3	\
 	doc/man/man3/vswscanf_s.3	\
@@ -410,7 +403,7 @@ dist_man_MANS += \
 	doc/man/man3/vwprintf_s.3	\
 	doc/man/man3/vwprintf_s.c.3	\
 	doc/man/man3/vwscanf_s.3	\
-	doc/man/man3/vwscanf_s.c.3	\
+	doc/man/man3/vwscanf_s.c.3 	\
 	doc/man/man3/wcrtomb_s.3	\
 	doc/man/man3/wcrtomb_s.c.3	\
 	doc/man/man3/wcscat_s.3		\
@@ -429,7 +422,6 @@ dist_man_MANS += \
 	doc/man/man3/wcslwr_s.c.3	\
 	doc/man/man3/wcsnatcmp_s.3	\
 	doc/man/man3/wcsnatcmp_s.c.3	\
-	doc/man/man3/wcsnaticmp_s.3	\
 	doc/man/man3/wcsncat_s.3	\
 	doc/man/man3/wcsncat_s.c.3	\
 	doc/man/man3/wcsncmp_s.3	\
@@ -471,50 +463,52 @@ dist_man_MANS += \
 	doc/man/man3/wprintf_s.c.3	\
 	doc/man/man3/wscanf_s.3		\
 	doc/man/man3/wscanf_s.c.3
-#if ENABLE_WCHAR
-#dist_man_MANS += \
 #	doc/man/man3/WCSNORM_FCC.3      \
 #	doc/man/man3/WCSNORM_FCD.3      \
 #	doc/man/man3/WCSNORM_NFC.3      \
 #	doc/man/man3/WCSNORM_NFD.3      \
 #	doc/man/man3/WCSNORM_NFKC.3     \
 #	doc/man/man3/WCSNORM_NFKD.3
-#endif
-CLEANFILES += Doxyfile doc/footer README.md
+endif
+CLEANFILES += Doxyfile doc/footer
+MAINTAINERCLEANFILES = *~ README.rst
 
 # avoid parallel doxygen
+if HAVE_DOXYGEN
 $(dist_man_MANS) ::
-doc/man/man3/EOK.3 :: Doxyfile README.md doc/footer include/safe_config.h
+doc/man/man3/EOK.3 :: Doxyfile README.rst doc/footer include/safe_config.h
 	-rm $@
-	doxygen
-
-docs man: Doxyfile doc/footer $(BUILT_SOURCES) README.md \
+	$(DOXYGEN)
+docs man: Doxyfile doc/footer $(BUILT_SOURCES) README.rst \
    doc/man/man1/check_for_unsafe_apis.1 doc/man/man3/EOK.3
 	-rm -rf doc/man/man3/d[0-9a-f]
 	-rm doc/man/man3/_*.3
+	-rm doc/man/man3/v.3
+	-rm doc/man/man3/_*_chk.3
 	-rm doc/man/man3/slk_*.3
 	-rm doc/man/man3/BOS*.3
-	-rm doc/man/man3/VAL_OVR2*
 	-rm doc/man/man3/HAVE___BUILTIN_CONSTANT_P.3
 	-rm doc/man/man3/HAVE___BUILTIN_OBJECT_SIZE.3
+	-rm doc/man/man3/UNWIF_*.3
+	-rm doc/man/man3/TBL.3
 	-rm doc/man/man3/VAL_OVR2*
-	-rm doc/man/man3/{wmask,wsize,likely,unlikely}.3
+	-rm doc/man/man3/{wmask,wsize}.3
+	-rm doc/man/man3/ASM_VOLATILE.3
 	-rm doc/man/man3/CASE*.3
 	-rm doc/man/man3/DRV*.3
-	-rm doc/man/man3/INLINE.3
-	-rm doc/man/man3/EOVERFLOW.3
-	-rm doc/man/man3/EXPORT_SYMBOL.3
-	-rm doc/man/man3/EXPORT.3
+	-rm doc/man/man3/DISABLE_DLLIMPORT.3
 	-rm doc/man/man3/EXTERN.3
+	-rm doc/man/man3/errno_t.3
 	-rm doc/man/man3/Hangul*.3
 	-rm doc/man/man3/hangul.h.3
-	-rm doc/man/man3/UNWIF_*.3
+	-rm doc/man/man3/seqindex_*
+	-rm doc/man/man3/*case_seqindex.3
+	-rm doc/man/man3/UINT16_MAX.3
 	-rm doc/man/man3/README*
+	-rm doc/man/man3/__STDC_WANT_LIB_EXT1__.3
+	-rm doc/man/man3/__WORDSIZE.3
 	-rm doc/man/man3/MODULE*.3
-	-rm doc/man/man3/NDEBUG.3
 	-rm doc/man/man3/NORMALIZE_IND_TBL.3
-	-rm doc/man/man3/RCNEGATE.3
-	-rm doc/man/man3/SAFECLIB_ENABLE_UNSAFE.3
 	-rm doc/man/man3/is*.3
 	-rm doc/man/man3/debruijn32.3
 	-rm doc/man/man3/errmsgs_s.3
@@ -530,10 +524,7 @@ docs man: Doxyfile doc/footer $(BUILT_SOURCES) README.md \
 	-rm doc/man/man3/pntz.3
 	-rm doc/man/man3/pos.3
 	-rm doc/man/man3/sl_default_handler.3
-	-rm doc/man/man3/slabort.3
-	-rm doc/man/man3/sldebug_printf.3
 	-rm doc/man/man3/slkm_init.c.3
-	-rm doc/man/man3/slprintf.3
 	-rm doc/man/man3/module_{exit,init}.3
 	-rm doc/man/man3/sift.3
 	-rm doc/man/man3/v.3
@@ -541,6 +532,10 @@ docs man: Doxyfile doc/footer $(BUILT_SOURCES) README.md \
 	-rm doc/man/man3/todo.3
 	-rm doc/man/man3/tbl2.3
 	-rm doc/man/man3/tbl3.3
+	-rm doc/man/man3/unsafe_get_property.3
+	-rm doc/man/man3/unw16if*.h.3
+	-rm doc/man/man3/unwif*.h.3
+	-rm doc/man/man3/wsize.3
 	-rm doc/man/man3/md_doc_libc-overview.3
 	-rm doc/man/man3/libc-overview.md.3
 	-rm doc/man/man3/len{_errmsgs_s,}.3
@@ -554,8 +549,11 @@ docs man: Doxyfile doc/footer $(BUILT_SOURCES) README.md \
 	-rm doc/man/man3/handle_{,w,mem_}error.3
 	-rm doc/man/man3/handle_{str,mem}_bos_*.3
 	-rm doc/man/man3/handle_str_src_bos_*.3
-README.md: README
-	cp $(srcdir)/README README.md
+endif
+if HAVE_PANDOC
+README.rst: README.md
+	pandoc -o README.rst README.md
+endif
 all-local: Doxyfile doc/footer
 clean-local:
 	rm -rf $(builddir)/doc/html
@@ -592,6 +590,15 @@ check-log:
 perf:
 	tests/p_memcpy_s
 	tests/p_memcpy32_s
+pkg:
+	-rm -rf inst
+	$(MAKE) install DESTDIR="`pwd`/inst" prefix=/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+if HAVE_MINGW
+	(cd inst && zip ../$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-$(host_triplet).zip -r $(PACKAGE_TARNAME)-$(PACKAGE_VERSION) && cd -)
+else
+	tar cfz $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-$(host_triplet).tar.gz -C inst $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+endif
+	rm -rf inst
 gh-pages: docs
 	echo ensure ./configure --enable-unsafe
 	ls doc/man/man3/tmpnam_s.3
@@ -605,6 +612,7 @@ gh-pages: docs
 release: docs distcheck
 	git branch |grep '^* master'
 	git tag -f v`date +%d%m%Y`
+	git tag -f $(PACKAGE_VERSION)
 	build-aux/autogen.sh
 	./configure
 	$(MAKE)
@@ -619,6 +627,6 @@ release: docs distcheck
 	$(MAKE) docs
 	$(MAKE) gh-pages
 	git branch |grep '^* gh-pages'
-	git commit -m"Update to v`date +%d%m%Y`"
+	git commit -m"Update to $(PACKAGE_VERSION)"
 	git push
 	git checkout master

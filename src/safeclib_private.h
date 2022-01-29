@@ -35,7 +35,9 @@
 #define __SAFECLIB_PRIVATE_H__
 
 #ifndef DEBUG
+#ifndef NDEBUG
 #define NDEBUG
+#endif
 #endif
 
 #include "config.h"
@@ -50,6 +52,8 @@
 /* Needed since the switch to time64_t */
 #if defined CONFIG_COMPAT_32BIT_TIME && defined _LINUX_TIME64_H && defined __VDSO_TIME32_H
 #define time_t old_time32_t
+#elif defined _LINUX_TIME64_H && !defined __VDSO_TIME32_H
+#define time_t time64_t
 #endif
 
 #define RCNEGATE(x) (-(x))
@@ -594,11 +598,16 @@ typedef unsigned long uintptr_t;
 #define vswprintf(dest, dmax, fmt, ap) vswprintf(dest, fmt, ap)
 #endif
 
+#define wcstombs_s(retvalp, dest, dmax, src, len)                              \
+    _wcstombs_s_chk(retvalp, dest, dmax, src, len, BOS(dest))
+
 /* mingw64 3.0.1
    has strtok_s, wcstok_s, and vsnprintf_s, which we patch in the tests. */
+#undef _ENC_W16
 
 #if SIZEOF_WCHAR_T > 2
 
+#undef _ENC_W16
 #define _dec_w16(src) *(src)
 #define _ENC_W16(dest, dmax, cp)                                               \
     *(dest)++ = (cp);                                                          \
@@ -636,5 +645,74 @@ EXTERN int _decomp_s(wchar_t *restrict dest, rsize_t dmax, const uint32_t cp,
                      const bool iscompat);
 
 #endif /* SAFECLIB_DISABLE_WCHAR */
+
+// internal helpers for the *printf_s functions:
+
+// output function type
+typedef int (*out_fct_type)(char character, void *buffer, size_t idx,
+                            size_t maxlen);
+// wrapper (used as buffer) for output function type
+typedef struct {
+    int (*fct)(char character, void *arg);
+    void *arg;
+} out_fct_wrap_type;
+
+// internal buffer output
+static inline int safec_out_buffer(char character, void *buffer, size_t idx,
+                                    size_t maxlen)
+{
+    if (idx < maxlen) {
+        ((char *)buffer)[idx] = character;
+        return 1;
+    } else {
+        invoke_safe_str_constraint_handler("vsnprintf_s: exceeds dmax",
+                                           (char*)buffer, ESNOSPC);
+        return -(ESNOSPC);
+    }
+}
+
+// internal putchar wrapper
+static inline int safec_out_char(char character, void *buffer, size_t idx,
+                                  size_t maxlen)
+{
+    (void)buffer;
+    (void)idx;
+    (void)maxlen;
+    if (character) {
+#ifndef __KERNEL__
+        return putchar(character);
+#else
+        int rc = 0;
+        rc = slprintf("%c", character);
+        return rc;
+#endif
+    }
+    else
+        return 0;
+}
+
+#ifndef __KERNEL__
+// special-case of safec_out_fct for fprintf_s
+static inline int safec_out_fchar(char character, void *wrap, size_t idx,
+                             size_t maxlen) {
+    (void)idx;
+    (void)maxlen;
+    //((out_fct_wrap_type *)wrap)->fct(character, ((out_fct_wrap_type *)wrap)->arg);
+    return fputc(character, (FILE*)((out_fct_wrap_type *)wrap)->arg);
+}
+#endif
+
+// internal output function wrapper
+static inline int safec_out_fct(char character, void *wrap, size_t idx,
+                                 size_t maxlen) {
+    (void)idx;
+    (void)maxlen;
+    // wrap is the output fct pointer
+    return ((out_fct_wrap_type *)wrap)->fct(character, ((out_fct_wrap_type *)wrap)->arg);
+}
+
+// mingw has a _vsnprintf_s. we use our own.
+int safec_vsnprintf_s(out_fct_type out, const char *funcname, char *buffer,
+                      const size_t bufsize, const char *format, va_list va);
 
 #endif /* __SAFECLIB_PRIVATE_H__ */

@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------
  * test_sprintf_s
  * File 'str/sprintf_s.c'
- * Lines executed:96.88% of 32
+ * Lines executed:100.00% of 5
  *
  *------------------------------------------------------------------
  */
@@ -16,11 +16,11 @@ EXTERN int sprintf_s(char *restrict dest, rsize_t dmax,
 #endif
 #endif
 
-#ifdef HAVE_SPRINTF_S
-#define HAVE_NATIVE 1
-#else
-#define HAVE_NATIVE 0
-#endif
+//#ifdef HAVE_SPRINTF_S
+//#define HAVE_NATIVE 1
+//#else
+//#define HAVE_NATIVE 0
+//#endif
 #include "test_msvcrt.h"
 
 #define LEN (128)
@@ -64,7 +64,7 @@ int test_sprintf_s(void) {
     rc = sprintf_s(str1, LEN, NULL);
     ERR_MSVC(-ESNULLP, -1);
     ERRNO_MSVC(0, EINVAL);
-#endif
+ #endif
 
     /*--------------------------------------------------*/
 
@@ -76,7 +76,7 @@ int test_sprintf_s(void) {
     /*--------------------------------------------------*/
 
     rc = sprintf_s(str1, LEN, "%s %n", str2, &ind);
-    ERR(-1); /* EINVAL */
+    ERR(-EINVAL);
     errno = 0;
 
     rc = sprintf_s(str1, LEN, "%s %%n", str2);
@@ -87,11 +87,9 @@ int test_sprintf_s(void) {
 
     /*--------------------------------------------------*/
 
-    /* TODO not yet implemented
-    rc = sprintf_s(str1, LEN, "%p", NULL);
-    ERR(-1);
-    ERRNO_MSVC(ESNULLP, EINVAL);
-    */
+    rc = sprintf_s(str1, LEN, "%s", NULL);
+    ERR(-ESNULLP);
+    ERRNO_MSVC(0, EINVAL); // ??
 
     /*--------------------------------------------------*/
 
@@ -156,6 +154,13 @@ int test_sprintf_s(void) {
     ERRNO_MSVC(0, ERANGE);
     EXPNULL(str1)
 
+    str1[0] = '\0';
+
+    rc = sprintf_s(str1, 5, "%ld", -10000000L);
+    ERR_MSVC(-ESNOSPC, -1);
+    ERRNO_MSVC(0, ERANGE);
+    EXPNULL(str1)
+
     /*--------------------------------------------------*/
 
     str1[0] = '\0';
@@ -171,6 +176,12 @@ int test_sprintf_s(void) {
     str2[0] = '\0';
 
     rc = sprintf_s(str1, LEN, "%s", str2);
+    ERR(0)
+    EXPNULL(str1)
+
+    strcpy(str1, "qqweqq");
+
+    rc = sprintf_s(str1, LEN, "%s", "");
     ERR(0)
     EXPNULL(str1)
 

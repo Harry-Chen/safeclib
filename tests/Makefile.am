@@ -118,6 +118,8 @@ SAFEC_BUILT_TESTS += \
 	t_memzero_s           \
 	t_memzero32_s         \
 	t_memzero16_s         \
+	t_stpcpy_s            \
+	t_stpncpy_s           \
 	t_strcasecmp_s        \
 	t_strcasestr_s        \
 	t_strcmp_s            \
@@ -195,9 +197,16 @@ SAFEC_BUILT_TESTS += 	\
 endif
 endif
 
-SAFEC_BUILT_PERFS =  p_memcpy_s p_memset_s p_strcpy_s
+SAFEC_BUILT_PERFS = \
+	p_memcpy_s \
+	p_strcpy_s
+if !HAVE_MINGW
+SAFEC_BUILT_PERFS += \
+	p_memset_s
+endif
 if ENABLE_EXTS
-SAFEC_BUILT_PERFS += p_memcpy32_s
+SAFEC_BUILT_PERFS += \
+	p_memcpy32_s
 endif
 
 SAFEC_TEST_COMMON = \
@@ -277,9 +286,12 @@ endif
 # endif
 # endif
 
-p_memcpy_s_SOURCES            = perf_memcpy_s.c $(SAFEC_TEST_COMMON)
-p_memset_s_SOURCES            = perf_memset_s.c $(SAFEC_TEST_COMMON)
-p_strcpy_s_SOURCES            = perf_strcpy_s.c $(SAFEC_TEST_COMMON)
+p_memcpy_s_SOURCES            = perf_memcpy_s.c $(SAFEC_TEST_COMMON) perf_private.h
+p_memset_s_SOURCES            = perf_memset_s.c $(SAFEC_TEST_COMMON) perf_private.h
+p_memset_s_CFLAGS             = $(CFLAGS) $(AM_CFLAGS) -I$(top_srcdir)/src
+# needed for windows
+p_memset_s_LDFLAGS            = $(top_builddir)/src/mem/mem_primitives_lib.lo $(LDADD)
+p_strcpy_s_SOURCES            = perf_strcpy_s.c $(SAFEC_TEST_COMMON) perf_private.h
 
 t_memcpy_s_SOURCES            = test_memcpy_s.c $(SAFEC_TEST_COMMON) \
 	                        $(SAFEC_TEST_MSVCRT) test_expmem.h
@@ -426,6 +438,8 @@ t_memset16_s_SOURCES          = test_memset16_s.c $(SAFEC_TEST_COMMON) test_expm
 t_memzero_s_SOURCES           = test_memzero_s.c $(SAFEC_TEST_COMMON) test_expmem.h
 t_memzero32_s_SOURCES         = test_memzero32_s.c $(SAFEC_TEST_COMMON) test_expmem.h
 t_memzero16_s_SOURCES         = test_memzero16_s.c $(SAFEC_TEST_COMMON) test_expmem.h
+t_stpcpy_s_SOURCES            = test_stpcpy_s.c $(SAFEC_TEST_COMMON)
+t_stpncpy_s_SOURCES           = test_stpncpy_s.c $(SAFEC_TEST_COMMON)
 t_strcasecmp_s_SOURCES        = test_strcasecmp_s.c $(SAFEC_TEST_COMMON)
 t_strcasestr_s_SOURCES        = test_strcasestr_s.c $(SAFEC_TEST_COMMON)
 t_strcmpfld_s_SOURCES         = test_strcmpfld_s.c $(SAFEC_TEST_COMMON)
@@ -501,7 +515,7 @@ clean-local:
 	rm -rf *.dSYM
 endif
 CLEANFILES  = *~ *.lo *.o *.i t_*.log t_*.trs *.exe test-fc.pl test-upr.pl
-CLEANFILES  += *.gcno *.gcda
+CLEANFILES  += *.gcno *.gcda DerivedGeneralCategory.txt CaseFolding.txt
 if ENABLE_GCOV
 CLEANFILES  += *.gcov gcov.log
 endif
