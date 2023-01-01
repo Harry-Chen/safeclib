@@ -1,3 +1,9 @@
+safeclib (3.7.1-2) unstable; urgency=medium
+
+  * Add tzdata to B-Depends.  Closes: #1027380.
+
+ -- Adam Borowski <kilobyte@angband.pl>  Sun, 01 Jan 2023 19:17:45 +0100
+
 safeclib (3.7.1-1) unstable; urgency=medium
 
   * New upstream bugfix release.
