@@ -1,7 +1,7 @@
 Source: safeclib
 Priority: optional
 Maintainer: Adam Borowski <kilobyte@angband.pl>
-Build-Depends: debhelper-compat (= 13), unicode-data
+Build-Depends: debhelper-compat (= 13), unicode-data, tzdata
 Standards-Version: 4.6.0
 Section: libs
 Homepage: https://rurban.github.io/safeclib/
