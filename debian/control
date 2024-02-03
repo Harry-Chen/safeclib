@@ -1,7 +1,7 @@
 Source: safeclib
 Priority: optional
 Maintainer: Adam Borowski <kilobyte@angband.pl>
-Build-Depends: debhelper-compat (= 13), unicode-data
+Build-Depends: debhelper-compat (= 13), unicode-data, tzdata
 Standards-Version: 4.6.2
 Section: libs
 Homepage: https://rurban.github.io/safeclib/
@@ -12,7 +12,7 @@ Package: libsafec-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libsafec3 (= ${binary:Version}), ${misc:Depends}
+Depends: libsafec3t64 (= ${binary:Version}), ${misc:Depends}
 Description: "safe" C libc extensions (Annex K) - dev
  This library implements controversial C11 Annex K (TR24731) extensions. 
  They are most commonly known as _s variants implemented by MSVC, dubbed as
@@ -28,7 +28,10 @@ Description: "safe" C libc extensions (Annex K) - dev
  .
  This package includes development headers.
 
-Package: libsafec3
+Package: libsafec3t64
+Provides: ${t64:Provides}
+Replaces: libsafec3
+Breaks: libsafec3 (<< ${source:Version})
 Architecture: any
 Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends}

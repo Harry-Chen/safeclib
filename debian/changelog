@@ -1,3 +1,10 @@
+safeclib (3.7.1-2.1~exp1) experimental; urgency=medium
+
+  * Non-maintainer upload.
+  * Rename libraries for 64-bit time_t transition.
+
+ -- Sergio Durigan Junior <sergiodj@debian.org>  Sat, 03 Feb 2024 21:07:35 +0000
+
 safeclib (3.7.1-2) unstable; urgency=medium
 
   * Add tzdata to B-Depends.  Closes: #1027380.

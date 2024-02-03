@@ -88,6 +88,11 @@ src/Scripts.txt
 src/extwchar/un8if*.h
 
 #
+# Debian directory (make deb-pkg)
+#
+/debian/
+
+#
 # git files that we don't want to ignore even it they are dot-files
 #
 !.gitattributes
