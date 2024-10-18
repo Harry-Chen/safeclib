@@ -1,0 +1,34 @@
+From 5c2160ddf012a1bb371eac725be46e8dd30a8d80 Mon Sep 17 00:00:00 2001
+From: Reini Urban <reini.urban@gmail.com>
+Date: Fri, 8 Mar 2024 08:46:44 +0100
+Subject: [PATCH] extend t_vswprintf_s for overlap
+Applied-Upstream: https://github.com/rurban/safeclib/commit/5c2160ddf012a1bb371eac725be46e8dd30a8d80
+Forwarded: not-needed
+
+glibc supports it now, apparently
+---
+ tests/test_vswprintf_s.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_vswprintf_s.c b/tests/test_vswprintf_s.c
+index 7d8026f04..c7232c379 100644
+--- a/tests/test_vswprintf_s.c
++++ b/tests/test_vswprintf_s.c
+@@ -209,8 +209,15 @@ int test_vswprintf_s(void) {
+     rc = vtwprintf_s(str1, 8, BOS(str1), L"%ls", &str1[7]);
+     /* overlapping implementation defined */
+ #if defined(__GLIBC__) || defined(_WIN32)
+-    ERR(-ESNOSPC);
+-    WEXPNULL(str1);
++    // both are valid
++    if (str1[0] == L'\0') {
++      WEXPNULL(str1);
++      ERR(-ESNOSPC);
++    } else if (wcscmp(str1, L"8901234") == 0) {
++      NOERR();
++    } else {
++      WEXPNULL(str1);
++    }
+ #else
+     NOERR();
+     /* WEXPSTR(str1, L"8901234"); or WEXPNULL(str1) */
