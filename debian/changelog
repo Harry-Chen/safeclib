@@ -1,3 +1,13 @@
+safeclib (3.7.1-2.1~exp2) experimental; urgency=medium
+
+  * Non-maintainer upload.
+  * d/patches: cherry-pick fix to tests from upstream (closes: #1042344)
+  * d/control: bump std-ver to 4.7.0 (no changes required)
+  * Remove now unused lintian-overrides
+  * Add symbol control file for libsafec3t64
+
+ -- Shengqi Chen <harry-chen@outlook.com>  Fri, 18 Oct 2024 15:11:06 +0800
+
 safeclib (3.7.1-2.1~exp1) experimental; urgency=medium
 
   * Non-maintainer upload.
