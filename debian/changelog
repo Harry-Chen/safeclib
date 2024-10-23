@@ -1,3 +1,20 @@
+safeclib (3.7.1-2.1) unstable; urgency=medium
+
+  [ Shengqi Chen ]
+  * Non-maintainer upload.
+  * No changes from 3.7.1-2.1~exp2, just upload to unstable.
+  
+  [ Sergio Durigan Junior ]
+  * Rename libraries for 64-bit time_t transition. (closes: #1062879)
+
+  [ Shengqi Chen ]
+  * d/patches: cherry-pick fix to tests from upstream
+  * d/control: bump std-ver to 4.7.0 (no changes required)
+  * Remove now unused lintian-overrides
+  * Add symbol control file for libsafec3t64
+
+ -- Shengqi Chen <harry-chen@outlook.com>  Wed, 23 Oct 2024 13:35:48 +0800
+
 safeclib (3.7.1-2.1~exp2) experimental; urgency=medium
 
   * Non-maintainer upload.
